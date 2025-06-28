@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add New Team Member – CaseLine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+    }
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 10px 16px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* Permission Buttons */
+    .permission-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .perm-btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      cursor: pointer;
+    }
+    .perm-btn.selected {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .selected-list {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Add New Team Member</h1>
+</header>
+
+<div class="container">
+  <form>
+    <h2>Member Details</h2>
+
+    <label for="name">Full Name</label>
+    <input type="text" id="name" placeholder="e.g., Suman Joshi" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="e.g., suman@yournews.org" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter secure password" required>
+
+    <label for="role">Role</label>
+    <select id="role" required>
+      <option value="">-- Select Role --</option>
+      <option value="reporter">Reporter</option>
+      <option value="editor">Editor</option>
+      <option value="manager">Manager</option>
+    </select>
+
+    <label>Permissions</label>
+    <div class="permission-options">
+      <div class="perm-btn" data-value="write">Write</div>
+      <div class="perm-btn" data-value="edit">Edit</div>
+      <div class="perm-btn" data-value="delete">Delete</div>
+      <div class="perm-btn" data-value="publish">Publish</div>
+      <div class="perm-btn" data-value="archive">Archive</div>
+    </div>
+
+    <label>Selected Permissions</label>
+    <div class="selected-list" id="selectedPermissions">
+      None
+    </div>
+
+    <button type="submit" class="btn">Create User</button>
+  </form>
+</div>
+
+<script>
+  const permissionButtons = document.querySelectorAll('.perm-btn');
+  const selectedList = document.getElementById('selectedPermissions');
+  let selectedPermissions = [];
+
+  permissionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const value = btn.getAttribute('data-value');
+      if (selectedPermissions.includes(value)) {
+        selectedPermissions = selectedPermissions.filter(p => p !== value);
+        btn.classList.remove('selected');
+      } else {
+        selectedPermissions.push(value);
+        btn.classList.add('selected');
+      }
+      updateSelectedList();
+    });
+  });
+
+  function updateSelectedList() {
+    if (selectedPermissions.length === 0) {
+      selectedList.innerText = "None";
+    } else {
+      selectedList.innerText = selectedPermissions.join(', ');
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CaseLine - Case Timeline</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    .timeline {
+      position: relative;
+      max-width: 800px;
+      margin: auto;
+    }
+    .timeline::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      background-color: #007bff;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -2px;
+    }
+    .entry {
+      padding: 20px 40px;
+      position: relative;
+      background-color: inherit;
+      width: 50%;
+      cursor: pointer;
+    }
+    .entry::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      right: -10px;
+      background-color: #007bff;
+      border: 3px solid #fff;
+      top: 30px;
+      border-radius: 50%;
+      z-index: 1;
+    }
+    .left {
+      left: 0;
+    }
+    .right {
+      left: 50%;
+    }
+    .right::after {
+      left: -10px;
+    }
+    .content {
+      padding: 20px;
+      background-color: white;
+      position: relative;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    }
+    .date {
+      font-size: 14px;
+      color: #6c757d;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #343a40;
+    }
+    .tag {
+      background: #e9ecef;
+      color: #007bff;
+      padding: 3px 10px;
+      font-size: 12px;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    .author {
+      font-size: 13px;
+      color: #444;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 6px;
+      width: 80%;
+      max-width: 700px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+
+    @media screen and (max-width: 768px) {
+      .entry {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+      }
+      .entry::after {
+        left: 60px;
+      }
+      .right {
+        left: 0%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>📁 Case Timeline: Rajesh Verma - Hit & Run</h2>
+
+<div class="timeline">
+
+  <div class="entry left" onclick="openModal('modal1')">
+    <div class="content">
+      <div class="date">Jan 5, 2022 <span class="tag">FIR</span></div>
+      <div class="title">FIR Registered Against Rajesh Verma</div>
+      <div class="author">by Anjali Mehta</div>
+      <p>Police registered the FIR after an eyewitness reported a hit and run at MG Road...</p>
+    </div>
+  </div>
+
+  <div class="entry right" onclick="openModal('modal2')">
+    <div class="content">
+      <div class="date">Feb 10, 2022 <span class="tag">Bail</span></div>
+      <div class="title">Bail Granted by District Court</div>
+      <div class="author">by Arvind Kumar</div>
+      <p>The accused was granted bail with conditions including passport surrender and weekly check-ins...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODALS -->
+
+<div id="modal1" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('modal1')">&times;</span>
+    <h3>FIR Registered Against Rajesh Verma</h3>
+    <p><strong>Date:</strong> Jan 5, 2022</p>
+    <p><strong>Author:</strong> Anjali Mehta</p>
+    <p>
+      On January 5, 2022, an FIR was filed at the Sector 14 Police Station after a delivery agent was struck by a car 
+      and left unattended. The accused, Rajesh Verma, was identified through CCTV footage. This marks the beginning of the case investigation.
+    </p>
+  </div>
+</div>
+
+<div id="modal2" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('modal2')">&times;</span>
+    <h3>Bail Granted by District Court</h3>
+    <p><strong>Date:</strong> Feb 10, 2022</p>
+    <p><strong>Author:</strong> Arvind Kumar</p>
+    <p>
+      In a court hearing, Rajesh Verma was granted interim bail. Conditions include surrender of passport,
+      mandatory weekly reporting to the local station, and a bond of ₹1 lakh. The court cited lack of prior criminal history.
+    </p>
+  </div>
+</div>
+
+<script>
+  function openModal(id) {
+    document.getElementById(id).style.display = "block";
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+  }
+</script>
+
+</body>
+</html>

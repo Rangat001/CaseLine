@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CaseLine - Case Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f3f5;
+    }
+    .header {
+      background: #1e293b;
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .header img {
+      height: 80px;
+      width: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .header-details {
+      flex: 1;
+    }
+    .header-details h1 {
+      margin: 0;
+    }
+    .meta {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    .entry {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.05);
+    }
+    .entry h2 {
+      margin: 0;
+      color: #1e293b;
+    }
+    .entry .info {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+    .entry p {
+      font-size: 15px;
+      color: #374151;
+    }
+    .entry img, .entry video {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 6px;
+    }
+    .status-badge {
+      background: #10b981;
+      color: white;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🧾 CASE HEADER -->
+<div class="header">
+  <img src="https://via.placeholder.com/80x80.png?text=Case" alt="Case Cover">
+  <div class="header-details">
+    <h1>Rajesh Verma - Hit & Run <span class="status-badge">Active</span></h1>
+    <div class="meta">Type: Criminal | Created by: NDTV | Created on: Jan 5, 2022</div>
+  </div>
+</div>
+
+<!-- 📜 JOURNAL POSTS -->
+<div class="container">
+
+  <div class="entry">
+    <h2>FIR Registered Against Rajesh Verma</h2>
+    <div class="info">Posted by Anjali Mehta on Jan 5, 2022</div>
+    <p>
+      An FIR was filed at the Sector 14 Police Station after a delivery agent was struck by a car
+      and left unattended. The accused, Rajesh Verma, was identified through CCTV footage.
+      This marks the beginning of the case investigation.
+    </p>
+    <img src="https://via.placeholder.com/700x300.png?text=CCTV+Snapshot" alt="Evidence Image">
+  </div>
+
+  <div class="entry">
+    <h2>District Court Grants Bail</h2>
+    <div class="info">Posted by Arvind Kumar on Feb 10, 2022</div>
+    <p>
+      The court granted interim bail with strict conditions. The accused must surrender his passport,
+      report weekly to the police, and pay a ₹1 lakh surety. The court cited no prior criminal record
+      as a factor in the decision.
+    </p>
+    <video controls>
+      <source src="sample-evidence.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <!-- 🧑‍💼 More team journal posts go here... -->
+
+</div>
+
+</body>
+</html>

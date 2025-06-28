@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create New Case – CaseLine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: #f9fafb;
+    }
+
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-weight: 600;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .case-photo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .photo-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #d1d5db;
+      margin-bottom: 10px;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .btn-submit {
+      padding: 12px 20px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Create New Case</h1>
+</header>
+
+<div class="container">
+  <form>
+    <div class="case-photo">
+      <img id="photoPreview" class="photo-preview" src="https://via.placeholder.com/120" alt="Profile">
+      <br>
+      <label for="casePhoto" class="upload-btn">Upload Case Photo</label>
+      <input type="file" id="casePhoto" accept="image/*" style="display: none;" onchange="loadPhoto(event)">
+    </div>
+
+    <label for="title">Case Title</label>
+    <input type="text" id="title" placeholder="e.g., Mumbai Water Scam Investigation" required>
+
+    <label for="desc">Case Description</label>
+    <textarea id="desc" rows="5" placeholder="Write details about the case..."></textarea>
+
+    <label for="tags">Tags / Categories</label>
+    <input type="text" id="tags" placeholder="e.g., Politics, Scam, WaterDept">
+
+    <label for="status">Case Status</label>
+    <select id="status" required>
+      <option value="">-- Select Status --</option>
+      <option value="open">Open</option>
+      <option value="under_investigation">Under Investigation</option>
+      <option value="closed">Closed</option>
+    </select>
+
+    <label for="lead">Assign Case Lead</label>
+    <select id="lead" required>
+      <option value="">-- Select Employee --</option>
+      <option value="riya-sharma">Riya Sharma</option>
+      <option value="prakash-verma">Prakash Verma</option>
+      <option value="anjali-mehta">Anjali Mehta</option>
+      <option value="mohit-rai">Mohit Rai</option>
+      <option value="riya-sharma">Riya Sharma</option>
+      <option value="prakash-verma">Prakash Verma</option>
+      <option value="anjali-mehta">Anjali Mehta</option>
+      <option value="mohit-rai">Mohit Rai</option>
+      <option value="riya-sharma">Riya Sharma</option>  
+      <option value="prakash-verma">Prakash Verma</option>
+      <option value="anjali-mehta">Anjali Mehta</option>
+      <option value="mohit-rai">Mohit Rai</option>
+      <option value="riya-sharma">Riya Sharma</option>
+      <option value="prakash-verma">Prakash Verma</option>
+      <option value="anjali-mehta">Anjali Mehta</option>
+      <option value="mohit-rai">Mohit Rai</option>
+    </select>
+
+    <button type="submit" class="btn-submit">Create Case</button>
+  </form>
+</div>
+
+<script>
+  function loadPhoto(event) {
+    const photo = document.getElementById('photoPreview');
+    photo.src = URL.createObjectURL(event.target.files[0]);
+  }
+</script>
+
+</body>
+</html>

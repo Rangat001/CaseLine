@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Org Admin Dashboard – CaseLine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+    }
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .btn {
+      padding: 8px 14px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      float: right;
+      text-decoration: none;
+    }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .user-table th, .user-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    .user-table th {
+      background: #f3f4f6;
+    }
+    .badge {
+      padding: 4px 10px;
+      font-size: 12px;
+      border-radius: 4px;
+      color: white;
+    }
+    .role-editor { background: #f59e0b; }
+    .role-reporter { background: #3b82f6; }
+    .role-manager { background: #8b5cf6; }
+    .active { background: #10b981; }
+    .inactive { background: #ef4444; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Organization Dashboard – CaseLine</h1>
+</header>
+
+<div class="container">
+  <h2>
+    Team Members
+    <a href="add-member.html" class="btn">+ Add New Member</a>
+  </h2>
+
+  <table class="user-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Permissions</th>
+        <th>Assigned Cases</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Arvind Kumar</td>
+        <td>arvind@ndtv.com</td>
+        <td><span class="badge role-editor">Editor</span></td>
+        <td>Write, Edit</td>
+        <td>Election Fraud, Mining Case</td>
+        <td><span class="badge active">Active</span></td>
+      </tr>
+      <tr>
+        <td>Anjali Mehta</td>
+        <td>anjali@ndtv.com</td>
+        <td><span class="badge role-reporter">Reporter</span></td>
+        <td>Write</td>
+        <td>Highway Hit & Run</td>
+        <td><span class="badge active">Active</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
