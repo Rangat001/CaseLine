@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class JWTutil {
+public class JWTutil{
 
-    @Value("${spring.security.JWT.SECRET_KEY}")
+    @Value("${jwt.secret}")
     private String SECRET_KEY;
 
     private SecretKey getSigningKey() {

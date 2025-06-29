@@ -1,13 +1,16 @@
 package com.example.rgt.CaseLine.config;
 
 import com.example.rgt.CaseLine.Repository.UserRepository;
+import com.example.rgt.CaseLine.Service.OrganizationUserDetailsService;
 import com.example.rgt.CaseLine.Service.UserDetailServiceImpl;
+import com.example.rgt.CaseLine.filter.JWTfilter;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,12 +29,17 @@ public class SpringSecurity {
     @Autowired
     private UserDetailServiceImpl userDetailService;
     @Autowired
+    private OrganizationUserDetailsService organizationUserDetailsService;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private JWTfilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests(request -> request
-                .requestMatchers("/public/**","/caseline/**","/auth/**").permitAll()
+                .requestMatchers("/public/**","/CaseLine/**","/auth/**").permitAll()
+                                .requestMatchers("/todo/**", "/user/**").authenticated()
                 ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -42,12 +50,30 @@ public class SpringSecurity {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(8);
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // 🔐 User Authentication Provider
+    @Bean
+    public DaoAuthenticationProvider userAuthProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    // 🔐 Organization Authentication Provider
+    @Bean
+    public DaoAuthenticationProvider orgAuthProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(organizationUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 }
 
