@@ -39,6 +39,10 @@ public class AuthController {
     @Autowired
     private DaoAuthenticationProvider orgAuthProvider;
 
+    //                                   User(Emp) only
+    @Autowired
+    private DaoAuthenticationProvider userAuthProvider;
+
     @Autowired
     private JWTutil jwTutil;
 
