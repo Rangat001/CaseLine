@@ -13,9 +13,9 @@ public class WebController {
         return "user_login";
     }
 
-    @GetMapping("/signup")
+    @GetMapping("/Add_member")
     public String signup(){
-        return "user_signup";
+        return "add-member";
     }
 
     @GetMapping("/org-login")

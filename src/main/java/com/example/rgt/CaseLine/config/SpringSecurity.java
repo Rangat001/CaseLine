@@ -43,6 +43,8 @@ public class SpringSecurity {
                 ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
+//                .authenticationProvider(userAuthProvider)
+//                .authenticationProvider(orgAuthProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

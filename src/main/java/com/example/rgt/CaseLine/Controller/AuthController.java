@@ -2,10 +2,7 @@ package com.example.rgt.CaseLine.Controller;
 
 import com.example.rgt.CaseLine.DTO.OrgLoginRequest;
 import com.example.rgt.CaseLine.Repository.OrgRepository;
-import com.example.rgt.CaseLine.Service.OrgService;
-import com.example.rgt.CaseLine.Service.OrganizationUserDetailsService;
-import com.example.rgt.CaseLine.Service.UserDetailServiceImpl;
-import com.example.rgt.CaseLine.Service.UserService;
+import com.example.rgt.CaseLine.Service.*;
 import com.example.rgt.CaseLine.entity.Organization;
 import com.example.rgt.CaseLine.entity.User;
 import com.example.rgt.CaseLine.util.JWTutil;
@@ -16,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -54,8 +52,12 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<User> createUser(@RequestBody User userEntity) {
-        try {
+    public ResponseEntity<User> createUser(@RequestBody User userEntity,@AuthenticationPrincipal UserDetails org) {
+        try{
+
+            int createdBy = ((CustomeOrgDetails) org).getId();
+            userEntity.setOrg_id(createdBy);
+
             userService.SaveNewUser(userEntity);
             return new ResponseEntity<>(userEntity, HttpStatus.OK);
         } catch (Exception e) {

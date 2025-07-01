@@ -26,10 +26,6 @@ public class OrganizationUserDetailsService implements UserDetailsService {
         if (org == null) {
             throw new UsernameNotFoundException("Organization not found");
         }
-        return new org.springframework.security.core.userdetails.User(
-                org.getEmail(),
-                org.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_ORG"))
-        );
+        return new CustomeOrgDetails(org);
     }
 }
