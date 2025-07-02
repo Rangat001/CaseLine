@@ -416,11 +416,16 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ email, password })
                 });
 
                 if (response.ok) {
+                    const token = await response.text();
+                    console.log(token);
+                    // Store the token in localStorage
+                    localStorage.setItem('jwt_token', token);
                     // ✅ Redirect on successful login
                     window.location.href = "/CaseLine/Admin_dashboard";
                 } else {

@@ -20,8 +20,23 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    public void SaveOwner(int org_id,String name,String Mail,String password){
+        //      Need to assign Role as Owner
+        User temp = new User();
+        temp.setOrg_id(org_id);
+        temp.setName(name);
+        temp.setEmail(Mail);
+        temp.setPassword(password);
+        temp.setRole(User.Role.owner);
+        SaveNewUser(temp);
+    }
+
     public void saveUser(User user){
-        userRepository.save(user);
+        try{
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     //                                save New User

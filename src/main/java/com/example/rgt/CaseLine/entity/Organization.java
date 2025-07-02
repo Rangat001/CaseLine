@@ -12,9 +12,9 @@ public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer org_id;
-
-    @Column(nullable = false, length = 100)
-    private String password;  // 🔐 for login purpose
+//
+//    @Column(nullable = false, length = 100)
+//    private String password;  // 🔐 for login purpose
 
     @Column(nullable = false, length = 25)
     private String owner_name;

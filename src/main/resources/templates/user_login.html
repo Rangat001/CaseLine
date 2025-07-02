@@ -397,8 +397,9 @@
 
 <script>
     // Form handling
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+
+    document.getElementById('loginBtn').addEventListener('click', async function (e) {
+        e.preventDefault(); // Prevent default button behavior
 
         const btn = document.getElementById('loginBtn');
         const errorMsg = document.getElementById('errorMessage');
@@ -408,24 +409,42 @@
         btn.textContent = '';
         errorMsg.style.display = 'none';
 
-        // Simulate API call
-        setTimeout(() => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-            // Demo: Simple validation (replace with actual API call)
-            if (email && password) {
-                // Success - redirect to dashboard
-                alert('Login successful! Redirecting to dashboard...');
-                // window.location.href = '/dashboard';
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+                const token = await response.text();
+                console.log(token);
+                // Store the token in localStorage
+                localStorage.setItem('jwt_token', token);
+                // ✅ Redirect on successful login
+                window.location.href = "/CaseLine/index";
             } else {
-                // Show error
+                const error = await response.text();
                 errorMsg.style.display = 'block';
-                btn.classList.remove('loading');
-                btn.textContent = 'Sign In to CaseLine';
+                errorMsg.textContent = error || 'Login failed. Please try again.';
             }
-        }, 1500);
+
+        } catch (error) {
+            console.error('Error:', error);
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = 'Something went wrong. Try again.';
+        } finally {
+            btn.classList.remove('loading');
+            btn.textContent = 'Sign In to CaseLine';
+        }
     });
+
 
     // Navigation functions
     function goBack() {

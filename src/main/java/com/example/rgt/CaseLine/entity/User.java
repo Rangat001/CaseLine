@@ -45,7 +45,8 @@ public class User {
     public enum Role {
         reporter,
         editor,
-        admin
+        admin,
+        owner
     }
 
     // Constructors, getters, setters, toString(), etc. (can be generated with Lombok if preferred)

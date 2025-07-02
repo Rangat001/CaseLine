@@ -18,16 +18,18 @@ public class OrgService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void createOrg(Organization org){
+    public boolean createOrg(Organization org){
         try{
             if (orgRepository.findByEmail(org.getEmail()) != null) {
                 throw new RuntimeException("Email already registered");
             }
-            org.setPassword(passwordEncoder.encode(org.getPassword()));
+//            org.setPassword(passwordEncoder.encode(org.getPassword()));
             orgRepository.save(org);
+            return true;
         } catch (Exception e) {
             System.out.println("Exception while creating Organization");
         }
+        return false;
     }
 
     public Optional<Organization> findByid(int id){

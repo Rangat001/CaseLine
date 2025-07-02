@@ -1,7 +1,8 @@
 package com.example.rgt.CaseLine.Controller;
 
-import com.example.rgt.CaseLine.DTO.OrgLoginRequest;
+import com.example.rgt.CaseLine.DTO.OrgLoginDTO;
 import com.example.rgt.CaseLine.Repository.OrgRepository;
+import com.example.rgt.CaseLine.Repository.UserRepository;
 import com.example.rgt.CaseLine.Service.*;
 import com.example.rgt.CaseLine.entity.Organization;
 import com.example.rgt.CaseLine.entity.User;
@@ -14,11 +15,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,16 +29,22 @@ public class AuthController {
     @Autowired
     private UserDetailServiceImpl userDetailService;
 
-    @Autowired
-    private OrganizationUserDetailsService OrgDetailService;
+//    @Autowired
+//    private OrganizationUserDetailsService OrgDetailService;
 
-    //                                    Org Login Only
-    @Autowired
-    private DaoAuthenticationProvider orgAuthProvider;
+//    //                                    Org Login Only
+//    @Autowired
+//    private DaoAuthenticationProvider orgAuthProvider;
+//
+//    //                                   User(Emp) only
+//    @Autowired
+//    private DaoAuthenticationProvider userAuthProvider;
 
-    //                                   User(Emp) only
     @Autowired
-    private DaoAuthenticationProvider userAuthProvider;
+    private OrgRepository orgRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private JWTutil jwTutil;
@@ -52,12 +57,16 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<User> createUser(@RequestBody User userEntity,@AuthenticationPrincipal UserDetails org) {
+    public ResponseEntity<User> createUser(@RequestBody User userEntity) {
         try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            int createdBy = ((CustomeOrgDetails) org).getId();
-            userEntity.setOrg_id(createdBy);
-
+            if (authentication != null && authentication.isAuthenticated()) {
+                int org_id = userRepository.findOrgId_ByName(authentication.getName());
+                userEntity.setOrg_id(org_id);
+            } else {
+                throw new Exception("Not Valid Admin");
+            }
             userService.SaveNewUser(userEntity);
             return new ResponseEntity<>(userEntity, HttpStatus.OK);
         } catch (Exception e) {
@@ -70,9 +79,12 @@ public class AuthController {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userEntity.getEmail(),userEntity.getPassword()));
-            UserDetails user = userDetailService.loadUserByUsername(userEntity.getEmail());
-            String token = jwTutil.generateToken(user.getUsername());
-            return new ResponseEntity<>(token,HttpStatus.OK);
+            User temp = userRepository.findByEmail(userEntity.getEmail());
+            if(temp.getRole() != User.Role.owner){
+                String token = jwTutil.generateToken(userEntity.getEmail());
+                return new ResponseEntity<>(token,HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>("Incorrect Credential", HttpStatus.BAD_REQUEST);
         }
@@ -81,24 +93,40 @@ public class AuthController {
     //                                          Organization
 
     @PostMapping("/org_signup")
-    public ResponseEntity<Organization> createOrg(@RequestBody Organization org) {
+    public ResponseEntity<Organization> createOrg(@RequestBody OrgLoginDTO org) {
         try {
-            orgService.createOrg(org);
-            return new ResponseEntity<>(org, HttpStatus.OK);
+            Organization temp = new Organization();
+            temp.setOrg_name(org.getOrg_name());
+            temp.setOwner_name(org.getOwner_name());
+            temp.setEmail(org.getEmail());
+            temp.setOrg_type(org.getOrg_type());
+            boolean result = orgService.createOrg(temp);
+            if(result){
+                Organization ORG = orgRepository.findByEmail(org.getEmail());
+                userService.SaveOwner(ORG.getOrg_id(),org.getOwner_name(),org.getEmail(),org.getPassword());
+            }else{
+                throw new RuntimeException("Error while creating org");
+            }
+            return new ResponseEntity<>(temp, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/org_login")
-    public ResponseEntity<?> login_org(@RequestBody OrgLoginRequest org){
+    public ResponseEntity<?> login_org(@RequestBody User user){
         try{
             long start = System.currentTimeMillis();
-            Authentication auth = orgAuthProvider.authenticate(
-                    new UsernamePasswordAuthenticationToken(org.getEmail(), org.getPassword()));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword()));
             System.out.println("Auth Time: " + (System.currentTimeMillis() - start) + "ms");
-            String token = jwTutil.generateToken(auth.getName());
-            return new ResponseEntity<>(token,HttpStatus.OK);
+            // check the user is owner or not
+            User temp = userRepository.findByEmail(user.getEmail());
+            if(temp.getRole() == User.Role.owner){
+                String token = jwTutil.generateToken(user.getEmail());
+                return new ResponseEntity<>(token,HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>("Incorrect Credential", HttpStatus.BAD_REQUEST);
         }

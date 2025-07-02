@@ -1,7 +1,7 @@
 package com.example.rgt.CaseLine.config;
 
 import com.example.rgt.CaseLine.Repository.UserRepository;
-import com.example.rgt.CaseLine.Service.OrganizationUserDetailsService;
+//import com.example.rgt.CaseLine.Service.OrganizationUserDetailsService;
 import com.example.rgt.CaseLine.Service.UserDetailServiceImpl;
 import com.example.rgt.CaseLine.filter.JWTfilter;
 import jakarta.servlet.Filter;
@@ -28,8 +28,8 @@ import java.util.List;
 public class SpringSecurity {
     @Autowired
     private UserDetailServiceImpl userDetailService;
-    @Autowired
-    private OrganizationUserDetailsService organizationUserDetailsService;
+//    @Autowired
+//    private OrganizationUserDetailsService organizationUserDetailsService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -38,13 +38,11 @@ public class SpringSecurity {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests(request -> request
-                .requestMatchers("/public/**","/CaseLine/**","/auth/**").permitAll()
-                                .requestMatchers("/todo/**", "/user/**").authenticated()
+                .requestMatchers("/CaseLine/**","/auth/login","/auth/org_signup","/auth/org_login").permitAll()
+                                .requestMatchers("/auth/signup", "/user/**").authenticated()
                 ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
-//                .authenticationProvider(userAuthProvider)
-//                .authenticationProvider(orgAuthProvider)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -59,23 +57,6 @@ public class SpringSecurity {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // 🔐 User Authentication Provider
-    @Bean
-    public DaoAuthenticationProvider userAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    // 🔐 Organization Authentication Provider
-    @Bean
-    public DaoAuthenticationProvider orgAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(organizationUserDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
 }
 
 
