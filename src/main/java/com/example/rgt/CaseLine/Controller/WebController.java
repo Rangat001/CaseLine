@@ -13,11 +13,6 @@ public class WebController {
         return "user_login";
     }
 
-    @GetMapping("/Add_member")
-    public String signup(){
-        return "add-member";
-    }
-
     @GetMapping("/org-login")
     public String org_login(){
         return "org_login";
@@ -28,12 +23,23 @@ public class WebController {
         return "org_signup";
     }
 
+    //                                     Admin Side
+    @GetMapping("/Add_member")
+    public String signup(){
+        return "add-member";
+    }
+
     @GetMapping("/Admin_dashboard")
     public String org_dashboard(){
         return "admin_dashboard";
     }
+    
+    @GetMapping("/Add_case")
+    public String add_case(){
+        return "add_case";
+    }
 
-
+    //                                     User Side
     @GetMapping("/index")
     public String index(){
         return "index";
