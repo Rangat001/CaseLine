@@ -33,7 +33,7 @@ public class WebController {
     public String org_dashboard(){
         return "admin_dashboard";
     }
-    
+
     @GetMapping("/Add_case")
     public String add_case(){
         return "add_case";

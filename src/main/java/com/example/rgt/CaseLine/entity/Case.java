@@ -41,7 +41,6 @@ public class Case {
         criminal, political, legal, event, accident // add all enum values
     }
 
-
     public enum Status {
         ongoing, closed, archived
     }
