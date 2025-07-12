@@ -90,7 +90,7 @@
 </header>
 
 <div class="container">
-  <form>
+  <form id="createCaseForm">
     <div class="case-photo">
       <img id="photoPreview" class="photo-preview" src="https://via.placeholder.com/120" alt="Profile">
       <br>
@@ -110,11 +110,11 @@
     <label for="status">Case Status</label>
     <select id="status" required>
       <option value="">-- Select Status --</option>
-      <option value="open">Open</option>
-      <option value="under_investigation">Under Investigation</option>
-      <option value="closed">Closed</option>
+      <option value="ongoing">ongoing</option>
+      <option value="archived">archived</option>
+      <option value="closed">closed</option>
     </select>
-    
+
 
     <button type="submit" class="btn-submit">Create Case</button>
   </form>
@@ -125,6 +125,40 @@
     const photo = document.getElementById('photoPreview');
     photo.src = URL.createObjectURL(event.target.files[0]);
   }
+  document.getElementById('createCaseForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const token = localStorage.getItem('jwt_token'); // 🔐 Get JWT token
+
+    const data = {
+      title: document.getElementById('title').value,
+      description: document.getElementById('desc').value,
+      caseType: document.getElementById('tags').value,
+      status: document.getElementById('status').value
+    };
+
+    try {
+      const response = await fetch('/Admin/create_case', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        alert('✅ Case created successfully!');
+        window.location.href = '/CaseLine/Admin_dashboard'; // Optional redirect
+      } else {
+        // const errorData = await response.json();
+        alert(`❌ Error:'Failed to create case.'}`);
+      }
+    } catch (error) {
+      console.error('Request failed:', error);
+      alert('❌ Something went wrong!');
+    }
+  });
 </script>
 
 </body>

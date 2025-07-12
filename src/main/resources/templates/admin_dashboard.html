@@ -88,7 +88,12 @@
       color: white;
     }
     .btn-edit {
-      background: #f59e0b;
+      background: rgba(245, 158, 11, 0.64);
+      color: white;
+      margin-left: 5px;
+    }
+    .btn-addmember{
+      background: #10b981;
       color: white;
       margin-left: 5px;
     }
@@ -133,7 +138,7 @@
 
   <!-- 🗂️ Case List -->
   <div class="section">
-    <h2>📁 All Cases <button class="btn btn-add" onclick="alert('Add Case Page Coming Soon')">+ New Case</button></h2>
+    <h2>📁 All Cases <button class="btn btn-add" onclick="redirectToAddCase()">+ New Case</button></h2>
     <table class="case-table">
       <thead>
         <tr>
@@ -146,23 +151,14 @@
       </thead>
       <tbody>
         <tr>
-          <td>Rajesh Verma – Hit & Run</td>
-          <td>Active</td>
-          <td>Jan 5, 2022</td>
-          <td>Anjali Mehta</td>
-          <td>
-            <button class="btn btn-view">View</button>
-            <button class="btn btn-edit">Edit</button>
-          </td>
-        </tr>
-        <tr>
           <td>Construction Bribery Case</td>
           <td>Closed</td>
           <td>Dec 10, 2021</td>
           <td>Rajeev Sharma</td>
           <td>
-            <button class="btn btn-view">View</button>
-            <button class="btn btn-edit">Edit</button>
+            <button class="btn btn-view">👁️View</button>
+            <button class="btn btn-edit">✏️Edit</button>
+            <button class="btn btn-addmember">➕Member</button>
           </td>
         </tr>
         <!-- More rows... -->
@@ -173,4 +169,66 @@
 </div>
 
 </body>
+<script>
+  function redirectToAddCase() {
+    window.location.href = "Add_case";
+  }
+
+  async function loadCases() {
+    const token = localStorage.getItem('jwt_token');
+
+    try {
+      const response = await fetch('/Admin/cases', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load cases');
+      }
+
+      const cases = await response.json();
+      const tbody = document.querySelector('.case-table tbody');
+      tbody.innerHTML = ''; // Clear any existing rows
+
+      cases.forEach(c => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${c.title}</td>
+          <td>${capitalize(c.status)}</td>
+          <td>${formatDate(c.createdDate)}</td>
+          <td>${c.createdBy}</td>
+          <td>
+            <button class="btn btn-view">👁️View</button>
+            <button class="btn btn-edit">✏️Edit</button>
+            <button class="btn btn-addmember">➕Member</button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+    } catch (error) {
+      console.error(error);
+      alert('Could not load case data.');
+    }
+  }
+
+  function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  document.addEventListener('DOMContentLoaded', loadCases);
+
+</script>
 </html>

@@ -22,7 +22,6 @@ public class WebController {
     public String org_signup(){
         return "org_signup";
     }
-
     //                                     Admin Side
     @GetMapping("/Add_member")
     public String signup(){
@@ -38,6 +37,7 @@ public class WebController {
     public String add_case(){
         return "add_case";
     }
+
 
     //                                     User Side
     @GetMapping("/index")
