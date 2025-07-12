@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface Case_GrupRepository extends JpaRepository<Case_Group,Integer> {
-
+    
 }

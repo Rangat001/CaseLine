@@ -1,6 +1,5 @@
 package com.example.rgt.CaseLine.Repository;
 
-import com.example.rgt.CaseLine.DTO.CasePostCountDTO;
 import com.example.rgt.CaseLine.entity.post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
