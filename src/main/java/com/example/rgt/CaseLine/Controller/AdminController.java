@@ -1,5 +1,6 @@
 package com.example.rgt.CaseLine.Controller;
 
+import com.example.rgt.CaseLine.DTO.AdminDashboardDTO;
 import com.example.rgt.CaseLine.Repository.UserRepository;
 import com.example.rgt.CaseLine.Service.AdminService;
 import com.example.rgt.CaseLine.entity.Case;
@@ -66,7 +67,12 @@ public class AdminController {
         if(authentication != null && authentication.isAuthenticated()){
             User user = userRepository.findByName(authentication.getName());
             if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
-                return new ResponseEntity<>(HttpStatus.OK);
+                int totalCase = adminService.countOfCases(user.getUser_id());
+                int totalPost = adminService.countOfPosts(user.getUser_id());
+                int totalMembers = adminService.countMembers(user.getUser_id());
+                int[] acive_close_ratio = adminService.Active_Close_ratio(user.getUser_id());
+                AdminDashboardDTO dashboardData = new AdminDashboardDTO(totalCase, totalPost, totalMembers, acive_close_ratio);
+                return new ResponseEntity<>(dashboardData, HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
