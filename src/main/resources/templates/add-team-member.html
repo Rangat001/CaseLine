@@ -9,25 +9,24 @@
 
 <h3>Add Team Member to Case</h3>
 
-<form method="POST" action="/submit-team-member">
+<form id="teamForm">
     <div class="mb-3">
-        <label class="form-label">Case</label>
-        <input type="text" id="caseTitle" name="caseTitle" class="form-control" readonly>
+<!--        <label class="form-label">Case</label>-->
+        <input type="hidden" id="caseTitle" name="caseTitle" class="form-control" readonly>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Employee Email</label>
-        <input type="email" name="email" class="form-control" required>
+        <input type="email" id="email" name="email" class="form-control" required>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Role</label>
-        <select name="role" class="form-select" required>
+        <select id="role" name="role" class="form-select" required>
             <option value="">-- Select Role --</option>
-            <option>Investigator</option>
-            <option>Analyst</option>
-            <option>Case Manager</option>
-            <option>Paralegal</option>
+            <option value="reporter">Reporter</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
         </select>
     </div>
 
@@ -40,6 +39,44 @@
     const urlParams = new URLSearchParams(window.location.search);
     document.getElementById('caseTitle').value = urlParams.get('caseTitle') || '';
     document.getElementById('caseId').value = urlParams.get('caseId') || '';
+
+
+    //     fetch Case_id
+    const pathSegments = window.location.pathname.split('/');
+    const caseIdFromUrl = pathSegments[pathSegments.length - 1];
+    document.getElementById('caseId').value = caseIdFromUrl;
+
+    document.getElementById('teamForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const payload = {
+            case_id: parseInt(document.getElementById('caseId').value),
+            email: document.getElementById('email').value,
+            role: document.getElementById('role').value
+        };
+
+        const token = localStorage.getItem('jwt_token'); // 🔐 Get JWT token
+        try {
+            const response = await fetch('/Admin/add_member', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Member added successfully!');
+                window.location.href = 'Admin_dashboard'; // or redirect as needed
+            } else {
+                alert('Failed to add member');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred');
+        }
+    });
 </script>
 
 </body>

@@ -52,4 +52,18 @@ public class UserService {
         }
     }
 
+    //                   Find User By email
+    public User findByMail(String mail){
+        try{
+            User user =  userRepository.findByEmail(mail);
+            if(user != null){
+                return user;
+            }else{
+                throw new IllegalArgumentException("User not found");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

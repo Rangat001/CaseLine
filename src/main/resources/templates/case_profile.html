@@ -79,7 +79,7 @@
 
 <!-- 🧾 CASE HEADER -->
 <div class="header">
-  <img src="https://via.placeholder.com/80x80.png?text=Case" alt="Case Cover">
+<!--  <img src="https://via.placeholder.com/80x80.png?text=Case" alt="Case Cover">-->
   <div class="header-details">
     <h1>Rajesh Verma - Hit & Run <span class="status-badge">Active</span></h1>
     <div class="meta">Type: Criminal | Created by: NDTV | Created on: Jan 5, 2022</div>
@@ -90,29 +90,9 @@
 <div class="container">
 
   <div class="entry">
-    <h2>FIR Registered Against Rajesh Verma</h2>
-    <div class="info">Posted by Anjali Mehta on Jan 5, 2022</div>
-    <p>
-      An FIR was filed at the Sector 14 Police Station after a delivery agent was struck by a car
-      and left unattended. The accused, Rajesh Verma, was identified through CCTV footage.
-      This marks the beginning of the case investigation.
-    </p>
-    <img src="https://via.placeholder.com/700x300.png?text=CCTV+Snapshot" alt="Evidence Image">
+
   </div>
 
-  <div class="entry">
-    <h2>District Court Grants Bail</h2>
-    <div class="info">Posted by Arvind Kumar on Feb 10, 2022</div>
-    <p>
-      The court granted interim bail with strict conditions. The accused must surrender his passport,
-      report weekly to the police, and pay a ₹1 lakh surety. The court cited no prior criminal record
-      as a factor in the decision.
-    </p>
-    <video controls>
-      <source src="sample-evidence.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-  </div>
 
   <!-- 🧑‍💼 More team journal posts go here... -->
 
@@ -120,3 +100,106 @@
 
 </body>
 </html>
+<script>
+// Extract case ID from URL (e.g., /case_profile.html?id=123 or /case_profile/123)
+function getCaseIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    if (id) return id;
+
+    // Alternative: extract from path if using REST-style URLs
+    const pathParts = window.location.pathname.split('/');
+    return pathParts[pathParts.length - 1];
+}
+
+// Get JWT token from localStorage or sessionStorage
+function getJwtToken() {
+    return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+}
+
+// Fetch case details from backend
+async function loadCaseDetails() {
+    const caseId = getCaseIdFromUrl();
+    const token = getJwtToken();
+
+    if (!caseId) {
+        console.error('Case ID not found in URL');
+        return;
+    }
+
+    if (!token) {
+        console.error('JWT token not found');
+        window.location.href = '/login.html'; // Redirect to login
+        return;
+    }
+
+    try {
+        const response = await fetch(`/Case/${caseId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            console.error('Unauthorized - redirecting to login');
+            localStorage.removeItem('jwt_token');
+            sessionStorage.removeItem('jwt_token');
+            window.location.href = '/org-login';
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const caseData = await response.json();
+        console.log('Case Data:', caseData);
+        updatePageWithCaseData(caseData);
+
+    } catch (error) {
+        console.error('Error fetching case details:', error);
+        document.querySelector('.container').innerHTML =
+            '<div class="entry"><h2>Error loading case details</h2></div>';
+    }
+}
+
+// Update the page with actual case data
+// Update the page with actual case data
+function updatePageWithCaseData(caseData) {
+  // Update header with case information
+  const headerTitle = document.querySelector('.header-details h1');
+  const headerMeta = document.querySelector('.header-details .meta');
+
+  if (caseData.title) {
+    headerTitle.innerHTML = `${caseData.title} <span class="status-badge">${caseData.status || 'Active'}</span>`;
+  }
+
+  if (caseData.caseType || caseData.createdBy || caseData.createdAt) {
+    const formattedDate = caseData.createdAt ? new Date(caseData.createdAt).toLocaleDateString() : 'N/A';
+    headerMeta.textContent = `Type: ${caseData.caseType || 'N/A'} | Created by: User ${caseData.createdBy || 'N/A'} | Created on: ${formattedDate}`;
+  }
+
+  // Add case description to the container
+  const container = document.querySelector('.container');
+  const entryDiv = container.querySelector('.entry');
+
+  if (caseData.description) {
+    entryDiv.innerHTML = `
+            <h2>Case Description</h2>
+            <div class="info">Case ID: ${caseData.caseId} | Organization: ${caseData.orgId} | Last Updated: ${caseData.updatedAt ? new Date(caseData.updatedAt).toLocaleDateString() : 'N/A'}</div>
+            <p>${caseData.description}</p>
+        `;
+  } else {
+    entryDiv.innerHTML = `
+            <h2>Case Information</h2>
+            <div class="info">Case ID: ${caseData.caseId} | Organization: ${caseData.orgId}</div>
+            <p>No description available for this case.</p>
+        `;
+  }
+}
+
+// Load case details when page loads
+document.addEventListener('DOMContentLoaded', loadCaseDetails);
+</script>

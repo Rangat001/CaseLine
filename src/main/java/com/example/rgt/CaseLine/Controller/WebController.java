@@ -2,6 +2,7 @@ package com.example.rgt.CaseLine.Controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -22,6 +23,7 @@ public class WebController {
     public String org_signup(){
         return "org_signup";
     }
+
     //                                     Admin Side
     @GetMapping("/Add_member")
     public String signup(){
@@ -43,6 +45,17 @@ public class WebController {
     @GetMapping("/index")
     public String index(){
         return "index";
+    }
+
+    //                              Case Profile
+    @GetMapping("/Case_Profile/{id}")
+    public String Case_Profile(@PathVariable int id){
+        return "case_profile";
+    }
+
+    @GetMapping("/case_member/{id}")
+    public String case_member(@PathVariable int id){
+        return "add-team-member";
     }
 
 

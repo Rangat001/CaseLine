@@ -24,4 +24,5 @@ public interface CaseRepository extends JpaRepository<Case, Integer> {
     Integer countClosedCases(@Param("adminId") Integer adminId);
 
 
+
 }

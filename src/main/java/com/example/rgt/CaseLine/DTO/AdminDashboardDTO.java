@@ -1,52 +1,28 @@
 package com.example.rgt.CaseLine.DTO;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class AdminDashboardDTO {
+    private String org_name;
     private int totalCase;
     private int totalPost;
     private int totalMembers;
-    private int[] activeCloseRatio;
+    private String activeCloseRatio;
 
     // Constructors
     public AdminDashboardDTO() {
     }
 
-    public AdminDashboardDTO(int totalCase, int totalPost, int totalMembers, int[] activeCloseRatio) {
+    public AdminDashboardDTO(String org_name,int totalCase, int totalPost, int totalMembers, String activeCloseRatio) {
+        this.org_name = org_name;
         this.totalCase = totalCase;
         this.totalPost = totalPost;
         this.totalMembers = totalMembers;
-        this.activeCloseRatio = activeCloseRatio;
-    }
-
-    // Getters and Setters
-    public int getTotalCase() {
-        return totalCase;
-    }
-
-    public void setTotalCase(int totalCase) {
-        this.totalCase = totalCase;
-    }
-
-    public int getTotalPost() {
-        return totalPost;
-    }
-
-    public void setTotalPost(int totalPost) {
-        this.totalPost = totalPost;
-    }
-
-    public int getTotalMembers() {
-        return totalMembers;
-    }
-
-    public void setTotalMembers(int totalMembers) {
-        this.totalMembers = totalMembers;
-    }
-
-    public int[] getActiveCloseRatio() {
-        return activeCloseRatio;
-    }
-
-    public void setActiveCloseRatio(int[] activeCloseRatio) {
         this.activeCloseRatio = activeCloseRatio;
     }
 }

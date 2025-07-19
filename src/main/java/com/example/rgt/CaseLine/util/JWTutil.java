@@ -54,7 +54,7 @@ public class JWTutil{
                 .setSubject(subject)
                 .setHeaderParam("typ", "JWT")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 1440)) // last para is minute
+                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 30)) // last para is minute   (for 30 days)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -70,7 +70,7 @@ public class JWTutil{
     public boolean isTokenExpiringSoon(String token) {
         Date expiryDate = extractExpiration(token);
         long timeLeft = expiryDate.getTime() - System.currentTimeMillis();
-        return timeLeft < 1000 * 60 * 360; // Refresh if less than 5 minutes left
+        return timeLeft < 1000L * 60 * 60 * 24 * 3; // Refresh if less than 3 days left
     }
 
 }

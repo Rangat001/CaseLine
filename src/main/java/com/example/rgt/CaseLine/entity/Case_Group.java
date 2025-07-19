@@ -3,18 +3,18 @@ package com.example.rgt.CaseLine.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-@Entity
+@Entity(name = "Case_Group")
 @Table(name = "case_group")
 @Data
 public class Case_Group {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer case_group_Id;
 
-    private Integer user_id;
+    @EmbeddedId
+    private CaseGroupId id;
 
-    private Integer case_id;
+    @Column(name = "group_id")
+    private Integer groupId;
 
+    @Enumerated(EnumType.STRING)
     private role role;
 
     public enum role {
