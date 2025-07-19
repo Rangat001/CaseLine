@@ -40,6 +40,12 @@ public class WebController {
         return "add_case";
     }
 
+     //                Edit Case
+    @GetMapping("/Edit_Case/{id}")
+    public String edit_case(@PathVariable int id){
+        return "edit-case";
+    }
+
 
     //                                     User Side
     @GetMapping("/index")
@@ -57,6 +63,7 @@ public class WebController {
     public String case_member(@PathVariable int id){
         return "add-team-member";
     }
+
 
 
 }

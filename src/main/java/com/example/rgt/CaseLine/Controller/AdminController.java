@@ -120,4 +120,76 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @GetMapping("/Case/{id}/members")
+    public ResponseEntity<?> getCaseMembers(@PathVariable int id) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication != null && authentication.isAuthenticated()){
+
+            User user = userRepository.findByName(authentication.getName());
+            // Check if the user is an admin or owner
+            if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
+
+                List<User> member = adminService.getMembersByCaseId(id);
+                return new ResponseEntity<>(member, HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/Case/{caseId}/member/{userId}/role")
+    public ResponseEntity<?> updateMemberRole(@PathVariable int caseId, @PathVariable int userId, @RequestParam Case_Group.role role) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication != null && authentication.isAuthenticated()){
+
+            User user = userRepository.findByName(authentication.getName());
+
+            if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
+                adminService.editMemberRole(caseId, userId, role);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/Case/{id}")
+    public ResponseEntity<?> updateCase(@PathVariable int id, @RequestBody Case entity) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication != null && authentication.isAuthenticated()){
+
+            User user = userRepository.findByName(authentication.getName());
+
+            if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
+                entity.setCaseId(id);
+                entity.setUpdatedAt(LocalDateTime.now());
+                adminService.editCase(entity);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+
+    @DeleteMapping("/Case/{caseId}/member/{userId}")
+    public ResponseEntity<?> deleteMember(@PathVariable int caseId, @PathVariable int userId) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if(authentication != null && authentication.isAuthenticated()){
+
+            User user = userRepository.findByName(authentication.getName());
+
+            if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
+                adminService.deleteMemberFromCase(caseId, userId);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
 }

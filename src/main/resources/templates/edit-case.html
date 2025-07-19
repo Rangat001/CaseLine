@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Edit Case – CaseLine</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', sans-serif;
+                background: #f9fafb;
+            }
+            header {
+                background: #1f2937;
+                color: white;
+                padding: 20px;
+            }
+            header h1 {
+                margin: 0;
+            }
+            .container {
+                max-width: 900px;
+                margin: 20px auto;
+                padding: 0 20px;
+            }
+            .card {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 0 6px rgba(0,0,0,0.05);
+                margin-bottom: 20px;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 500;
+                color: #374151;
+            }
+            .form-group input, .form-group textarea, .form-group select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+            .form-group textarea {
+                height: 80px;
+                resize: vertical;
+            }
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                margin-right: 10px;
+            }
+            .btn-primary {
+                background: #3b82f6;
+                color: white;
+            }
+            .btn-secondary {
+                background: #6b7280;
+                color: white;
+            }
+            .btn-danger {
+                background: #ef4444;
+                color: white;
+            }
+            .btn-success {
+                background: #10b981;
+                color: white;
+            }
+            .members-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            .members-table th, .members-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .members-table th {
+                background: #f9fafb;
+                color: #374151;
+            }
+            .role-select {
+                width: auto;
+                padding: 5px;
+                font-size: 12px;
+            }
+            .actions {
+                display: flex;
+                gap: 10px;
+                margin-top: 20px;
+            }
+            .section-title {
+                font-size: 18px;
+                color: #1f2937;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+
+    <header>
+        <h1>✏️ Edit Case – CaseLine</h1>
+    </header>
+
+    <div class="container">
+        <!-- Case Details Form -->
+        <div class="card">
+            <h2 class="section-title">Case Information</h2>
+            <form id="editCaseForm">
+                <div class="form-group">
+                    <label for="caseTitle">Case Title</label>
+                    <input type="text" id="caseTitle" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="caseDescription">Description</label>
+                    <textarea id="caseDescription" name="description" placeholder="Enter case description..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="caseStatus">Status</label>
+                    <select id="caseStatus" name="status" required>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="closed">Closed</option>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="caseType">Case Type</label>
+                    <input type="text" id="caseType" name="caseType" readonly>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">↩️ Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Case Members Section -->
+        <div class="card">
+            <h2 class="section-title">Case Members</h2>
+            <table class="members-table">
+                <thead>
+                    <tr>
+                        <th>Member Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTableBody">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentCaseId = null;
+        let caseMembers = [];
+
+        function getHeaders() {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            const token = localStorage.getItem('jwt_token');
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            return headers;
+        }
+
+        function getCaseIdFromUrl() {
+            const pathParts = window.location.pathname.split('/');
+            const caseId = pathParts[pathParts.length - 1];
+            const numericId = parseInt(caseId, 10);
+            return isNaN(numericId) ? null : numericId;
+        }
+
+        async function loadCaseDetails() {
+            currentCaseId = getCaseIdFromUrl();
+
+            if (!currentCaseId) {
+                alert('Invalid case ID');
+                goBack();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Case/${currentCaseId}`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load case details');
+                }
+
+                const caseData = await response.json();
+                populateCaseForm(caseData);
+
+            } catch (error) {
+                console.error('Error loading case details:', error);
+                alert('Error loading case details');
+            }
+        }
+
+        async function loadCaseMembers() {
+            try {
+                const response = await fetch(`/Case/${currentCaseId}/members`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load case members');
+                }
+
+                caseMembers = await response.json();
+                populateMembersTable();
+
+            } catch (error) {
+                console.error('Error loading case members:', error);
+                document.getElementById('membersTableBody').innerHTML =
+                    '<tr><td colspan="4">Error loading members</td></tr>';
+            }
+        }
+
+        function populateCaseForm(caseData) {
+            document.getElementById('caseTitle').value = caseData.title || '';
+            document.getElementById('caseDescription').value = caseData.description || '';
+            document.getElementById('caseStatus').value = caseData.status || 'ongoing';
+            document.getElementById('caseType').value = caseData.caseType || '';
+        }
+
+        function populateMembersTable() {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = '';
+
+            if (caseMembers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No members assigned to this case</td></tr>';
+                return;
+            }
+
+            caseMembers.forEach(member => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${member.memberName || member.name || 'Unknown'}</td>
+                    <td>${member.email || 'N/A'}</td>
+                    <td>
+                        <select class="role-select" onchange="updateMemberRole(${member.memberId}, this.value)">
+                            <option value="member" ${member.role === 'member' ? 'selected' : ''}>Member</option>
+                            <option value="lead" ${member.role === 'lead' ? 'selected' : ''}>Lead</option>
+                            <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="viewer" ${member.role === 'viewer' ? 'selected' : ''}>Viewer</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;"
+                                onclick="removeMember(${member.memberId})">🗑️ Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function updateMemberRole(memberId, newRole) {
+            try {
+                const response = await fetch(`/Case/${currentCaseId}/members/${memberId}/role`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update member role');
+                }
+
+                console.log(`Member ${memberId} role updated to ${newRole}`);
+                // Optionally show success message
+
+            } catch (error) {
+                console.error('Error updating member role:', error);
+                alert('Failed to update member role');
+                // Reload to revert the change
+                loadCaseMembers();
+            }
+        }
+
+        async function removeMember(memberId) {
+            if (!confirm('Are you sure you want to remove this member from the case?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Case/${currentCaseId}/members/${memberId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to remove member');
+                }
+
+                console.log(`Member ${memberId} removed from case`);
+                // Reload members list
+                loadCaseMembers();
+
+            } catch (error) {
+                console.error('Error removing member:', error);
+                alert('Failed to remove member');
+            }
+        }
+
+        document.getElementById('editCaseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const caseData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                status: formData.get('status'),
+                caseType: formData.get('caseType')
+            };
+
+            try {
+                const response = await fetch(`/Case/${currentCaseId}`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify(caseData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update case');
+                }
+
+                alert('Case updated successfully!');
+                goBack();
+
+            } catch (error) {
+                console.error('Error updating case:', error);
+                alert('Failed to update case');
+            }
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCaseDetails();
+            loadCaseMembers();
+        });
+    </script>
+
+    </body>
+    </html
