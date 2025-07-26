@@ -1,9 +1,11 @@
 package com.example.rgt.CaseLine.Service;
 
+import com.example.rgt.CaseLine.DTO.Case_Member_DTO;
 import com.example.rgt.CaseLine.Repository.*;
 import com.example.rgt.CaseLine.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,28 +110,34 @@ public class AdminService {
 
 
     //                      Get Members of a Case
-    public List<User> getMembersByCaseId(int caseId) {
+    public List<Case_Member_DTO> getMembersByCaseId(int caseId) {
 
         List<Case_Group> members = caseGrupRepository.findAllByCase_id(caseId);
-        List<User> users = new ArrayList<>();
+        List<Case_Member_DTO> users = new ArrayList<>();
 
         for (Case_Group member : members) {
             int id = member.getId().getUserId();
             Optional<User> user = userRepository.findById(id);
-            users.add(user.get());
+            Case_Member_DTO instance = new Case_Member_DTO(id,
+                    user.get().getName(),
+                    user.get().getEmail(),
+                    member.getRole());
+            users.add(instance);
         }
         return users;
     }
 
 
     //                            * Edit member role
+    @Transactional
     public void editMemberRole(int caseId, int userId, Case_Group.role newRole) {
         caseGrupRepository.updateRoleByCaseIdAndUserId(caseId, userId, newRole);
     }
 
     //                           * Delete Member from Case
+    @Transactional
     public void deleteMemberFromCase(int caseId, int userId) {
-        caseGrupRepository.deleteById(caseId, userId);
+        int affected_row = caseGrupRepository.deleteById(caseId, userId);
     }
 
 

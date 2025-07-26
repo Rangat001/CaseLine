@@ -133,8 +133,7 @@
                     <select id="caseStatus" name="status" required>
                         <option value="ongoing">Ongoing</option>
                         <option value="closed">Closed</option>
-                        <option value="pending">Pending</option>
-                        <option value="active">Active</option>
+                        <option value="archived">Archived</option>
                     </select>
                 </div>
 
@@ -186,10 +185,12 @@
         }
 
         function getCaseIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (id) return id;
+
             const pathParts = window.location.pathname.split('/');
-            const caseId = pathParts[pathParts.length - 1];
-            const numericId = parseInt(caseId, 10);
-            return isNaN(numericId) ? null : numericId;
+            return pathParts[pathParts.length - 1];
         }
 
         async function loadCaseDetails() {
@@ -222,7 +223,7 @@
 
         async function loadCaseMembers() {
             try {
-                const response = await fetch(`/Case/${currentCaseId}/members`, {
+                const response = await fetch(`/Admin/Case/${currentCaseId}/members`, {
                     method: 'GET',
                     headers: getHeaders()
                 });
@@ -232,6 +233,7 @@
                 }
 
                 caseMembers = await response.json();
+                console.log(caseMembers)
                 populateMembersTable();
 
             } catch (error) {
@@ -263,16 +265,15 @@
                     <td>${member.memberName || member.name || 'Unknown'}</td>
                     <td>${member.email || 'N/A'}</td>
                     <td>
-                        <select class="role-select" onchange="updateMemberRole(${member.memberId}, this.value)">
-                            <option value="member" ${member.role === 'member' ? 'selected' : ''}>Member</option>
-                            <option value="lead" ${member.role === 'lead' ? 'selected' : ''}>Lead</option>
+                        <select class="role-select" onchange="updateMemberRole(${member.user_id}, this.value)">
+                            <option value="reporter" ${member.role === 'reporter' ? 'selected' : ''}>Reporter</option>
+                            <option value="editor" ${member.role === 'editor' ? 'selected' : ''}>Editor</option>
                             <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>Admin</option>
-                            <option value="viewer" ${member.role === 'viewer' ? 'selected' : ''}>Viewer</option>
                         </select>
                     </td>
                     <td>
                         <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;"
-                                onclick="removeMember(${member.memberId})">🗑️ Remove</button>
+                                onclick="removeMember(${member.user_id})">🗑️ Remove</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -281,10 +282,10 @@
 
         async function updateMemberRole(memberId, newRole) {
             try {
-                const response = await fetch(`/Case/${currentCaseId}/members/${memberId}/role`, {
+                const response = await fetch(`/Admin/Case/${currentCaseId}/member/${memberId}/role`, {
                     method: 'PUT',
                     headers: getHeaders(),
-                    body: JSON.stringify({ role: newRole })
+                    body: JSON.stringify(newRole)
                 });
 
                 if (!response.ok) {
@@ -303,12 +304,13 @@
         }
 
         async function removeMember(memberId) {
+            console.log(memberId);
             if (!confirm('Are you sure you want to remove this member from the case?')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/Case/${currentCaseId}/members/${memberId}`, {
+                const response = await fetch(`/Admin/Case/${currentCaseId}/member/${memberId}`, {
                     method: 'DELETE',
                     headers: getHeaders()
                 });
@@ -339,7 +341,7 @@
             };
 
             try {
-                const response = await fetch(`/Case/${currentCaseId}`, {
+                const response = await fetch(`/Admin/Case/${currentCaseId}`, {
                     method: 'PUT',
                     headers: getHeaders(),
                     body: JSON.stringify(caseData)
@@ -370,4 +372,4 @@
     </script>
 
     </body>
-    </html
+    </html>

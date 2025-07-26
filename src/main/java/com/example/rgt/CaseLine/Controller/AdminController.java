@@ -2,6 +2,8 @@ package com.example.rgt.CaseLine.Controller;
 
 import com.example.rgt.CaseLine.DTO.Add_memberDTO;
 import com.example.rgt.CaseLine.DTO.AdminDashboardDTO;
+import com.example.rgt.CaseLine.DTO.Case_Member_DTO;
+import com.example.rgt.CaseLine.Repository.CaseRepository;
 import com.example.rgt.CaseLine.Repository.UserRepository;
 import com.example.rgt.CaseLine.Service.AdminService;
 import com.example.rgt.CaseLine.Service.UserService;
@@ -32,6 +34,9 @@ public class AdminController {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CaseRepository caseRepository;
 
 
     @PostMapping("/create_case")
@@ -131,7 +136,7 @@ public class AdminController {
             // Check if the user is an admin or owner
             if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
 
-                List<User> member = adminService.getMembersByCaseId(id);
+                List<Case_Member_DTO> member = adminService.getMembersByCaseId(id);
                 return new ResponseEntity<>(member, HttpStatus.OK);
             }
         }
@@ -139,7 +144,7 @@ public class AdminController {
     }
 
     @PutMapping("/Case/{caseId}/member/{userId}/role")
-    public ResponseEntity<?> updateMemberRole(@PathVariable int caseId, @PathVariable int userId, @RequestParam Case_Group.role role) {
+    public ResponseEntity<?> updateMemberRole(@PathVariable int caseId, @PathVariable int userId, @RequestBody Case_Group.role role) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -165,8 +170,12 @@ public class AdminController {
             User user = userRepository.findByName(authentication.getName());
 
             if(user.getRole()==User.Role.admin || user.getRole()==User.Role.owner){
+                Case org = caseRepository.findById(id);
                 entity.setCaseId(id);
                 entity.setUpdatedAt(LocalDateTime.now());
+                entity.setCreatedAt(org.getCreatedAt());
+                entity.setCreatedBy(org.getCreatedBy());
+                entity.setOrgId(org.getOrgId());
                 adminService.editCase(entity);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
