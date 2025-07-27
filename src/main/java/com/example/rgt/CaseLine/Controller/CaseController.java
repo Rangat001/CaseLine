@@ -1,6 +1,10 @@
 package com.example.rgt.CaseLine.Controller;
 
+import com.example.rgt.CaseLine.Repository.UserRepository;
 import com.example.rgt.CaseLine.Service.CaseService;
+import com.example.rgt.CaseLine.Service.UserService;
+import com.example.rgt.CaseLine.entity.User;
+import com.example.rgt.CaseLine.entity.post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,6 +18,11 @@ public class CaseController {
     @Autowired
     private CaseService caseService;
 
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("{id}")
     public ResponseEntity<?> getCaseDetails(@PathVariable int id) {
         try{
@@ -26,4 +35,52 @@ public class CaseController {
             return ResponseEntity.status(500).body("Error retrieving case details: " + e.getMessage());
         }
     }
+
+    @PostMapping("post/{caseId}")
+    public ResponseEntity<?> createPost(@PathVariable int caseId, @RequestBody post postContent) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User user = userRepository.findByName(authentication.getName());
+            if(authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Unauthorized access");
+            }
+            if(postContent == null || postContent.getContent() == null || postContent.getContent().isEmpty()) {
+                return ResponseEntity.badRequest().body("Post content cannot be empty");
+            }
+            if(caseService.partOfCase(user.getUser_id(),caseId)){
+                postContent.setCase_id(caseId);
+                postContent.setPosted_by(user.getUser_id());
+                caseService.createPost(caseId, postContent);
+            }
+            else {
+                return ResponseEntity.status(403).body("You are not part of this case");
+            }
+            return ResponseEntity.ok("Post created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error creating post: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("post/{Case_id}")
+    public ResponseEntity<?> updatePost(@PathVariable int Case_id, @RequestBody post postContent) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User user = userRepository.findByName(authentication.getName());
+            if(authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Unauthorized access");
+            }
+            if(caseService.partOfCase(user.getUser_id(),Case_id)){
+                postContent.setCase_id(Case_id);
+                postContent.setPosted_by(user.getUser_id());
+                caseService.createPost(Case_id, postContent);
+            }
+            else {
+                return ResponseEntity.status(403).body("You are not part of this case");
+            }
+            return ResponseEntity.ok("Post updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating post: " + e.getMessage());
+        }
+    }
+
 }

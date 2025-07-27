@@ -35,4 +35,6 @@ public interface Case_GrupRepository extends JpaRepository<Case_Group, CaseGroup
     int deleteById(@Param("caseId") Integer caseId,
                    @Param("userId") Integer userId);
 
+   @Query("SELECT cg.role FROM Case_Group cg WHERE cg.id.userId = :userId AND cg.groupId = :groupId")
+   Case_Group.role findRoleByUserIdAndGroupId(Integer userId, int groupId);
 }

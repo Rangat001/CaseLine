@@ -1,8 +1,11 @@
 package com.example.rgt.CaseLine.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "posts")
 public class post {
