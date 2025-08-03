@@ -19,11 +19,12 @@ public interface PostRepository extends JpaRepository<post, Integer> {
     Integer countTotalPostsByCreatedBy(@Param("createdBy") Integer createdBy);
 
     @Modifying
-    @Query("UPDATE post p SET p.content = :content, p.source_url = :source_url, p.media_url = :media_url, p.Status = :Status WHERE p.post_id = :PostId")
-    void updatepostById(@Param("PostId") Integer PostId, @Param("content") String content,
-                        @Param("source_url") String source_url, @Param("media_url") String media_url,
-                        @Param("Status") post.Status Status);
-
+    @Query("UPDATE post p SET p.content = :content, p.source_url = :source_url, p.media_url = :media_url, p.status = :status WHERE p.post_id = :post_id")
+    void updatepostById(@Param("post_id") Integer post_id,
+                        @Param("content") String content,
+                        @Param("source_url") String source_url,
+                        @Param("media_url") String media_url,
+                        @Param("status") post.Status status);
 
 
 }

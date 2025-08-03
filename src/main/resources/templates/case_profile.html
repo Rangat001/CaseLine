@@ -30,6 +30,27 @@
     .header-details h1 {
       margin: 0;
     }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .create-post-btn {
+      padding: 10px 20px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .create-post-btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
     .meta {
       color: #94a3b8;
       font-size: 14px;
@@ -73,6 +94,123 @@
       display: inline-block;
       margin-left: 10px;
     }
+    /*create post CSS */
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 2% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 95%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #1f2937;
+    }
+
+    .close {
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .close:hover {
+      color: #374151;
+    }
+
+    .form-group {
+      margin: 20px 24px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 95%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 20px 24px;
+      border-top: 1px solid #e5e7eb;
+      background-color: #f9fafb;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-cancel:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-submit {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-submit:hover {
+      background: #2563eb;
+    }
   </style>
 </head>
 <body>
@@ -83,6 +221,11 @@
   <div class="header-details">
     <h1>Rajesh Verma - Hit & Run <span class="status-badge">Active</span></h1>
     <div class="meta">Type: Criminal | Created by: NDTV | Created on: Jan 5, 2022</div>
+  </div>
+  <div class="header-actions">
+    <button id="createPostBtn" class="create-post-btn" onclick="showCreatePostForm()" style="display: none;">
+      📝 Create Post
+    </button>
   </div>
 </div>
 
@@ -98,7 +241,49 @@
 
 </div>
 
+<!-- Create Post Modal/Form -->
+<div id="createPostModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Create New Post</h2>
+      <span class="close" onclick="hideCreatePostForm()">&times;</span>
+    </div>
+    <form id="createPostForm">
+      <div class="form-group">
+        <label for="content">Content *</label>
+        <textarea id="content" name="content" required placeholder="Enter post content..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="source_url">Source URL</label>
+        <input type="url" id="source_url" name="source_url" placeholder="https://example.com">
+      </div>
+
+      <div class="form-group">
+        <label for="media_url">Media URL</label>
+        <input type="url" id="media_url" name="media_url" placeholder="https://example.com/image.jpg">
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status *</label>
+        <select id="status" name="status" required>
+          <option value="">Select Status</option>
+          <option value="draft">Draft</option>
+          <option value="pending">Pending</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" onclick="hideCreatePostForm()" class="btn-cancel">Cancel</button>
+        <button type="submit" class="btn-submit">Create Post</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 </body>
+
 </html>
 <script>
 // Extract case ID from URL (e.g., /case_profile.html?id=123 or /case_profile/123)
@@ -116,56 +301,127 @@ function getCaseIdFromUrl() {
 function getJwtToken() {
     return localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
 }
+// Add this function to check user membership
+async function checkUserMembership(caseId) {
+  const token = getJwtToken();
 
-// Fetch case details from backend
-async function loadCaseDetails() {
-    const caseId = getCaseIdFromUrl();
-    const token = getJwtToken();
+  try {
+    const response = await fetch(`/Case/${caseId}/check-membership`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-    if (!caseId) {
-        console.error('Case ID not found in URL');
-        return;
+    if (response.ok) {
+      const isMember = await response.json();
+      const createPostBtn = document.getElementById('createPostBtn');
+      console.table(response);
+      console.log(isMember);
+      // if (isMember) {
+        createPostBtn.style.display = 'block';
+      // }
     }
-
-    if (!token) {
-        console.error('JWT token not found');
-        window.location.href = '/login.html'; // Redirect to login
-        return;
-    }
-
-    try {
-        const response = await fetch(`/Case/${caseId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.status === 401) {
-            console.error('Unauthorized - redirecting to login');
-            localStorage.removeItem('jwt_token');
-            sessionStorage.removeItem('jwt_token');
-            window.location.href = '/org-login';
-            return;
-        }
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const caseData = await response.json();
-        console.log('Case Data:', caseData);
-        updatePageWithCaseData(caseData);
-
-    } catch (error) {
-        console.error('Error fetching case details:', error);
-        document.querySelector('.container').innerHTML =
-            '<div class="entry"><h2>Error loading case details</h2></div>';
-    }
+  } catch (error) {
+    console.error('Error checking membership:', error);
+  }
 }
 
-// Update the page with actual case data
+// Update your loadCaseDetails function
+async function loadCaseDetails() {
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  if (!caseId) {
+    console.error('Case ID not found in URL');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/Case/${caseId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const caseData = await response.json();
+    updatePageWithCaseData(caseData);
+
+    // Check user membership after loading case details
+    await checkUserMembership(caseId);
+
+  } catch (error) {
+    console.error('Error fetching case details:', error);
+  }
+}
+
+// Add function to handle create post button click
+// Update the showCreatePostForm function
+function showCreatePostForm() {
+  document.getElementById('createPostModal').style.display = 'block';
+}
+
+function hideCreatePostForm() {
+  document.getElementById('createPostModal').style.display = 'none';
+  document.getElementById('createPostForm').reset();
+}
+
+// Handle form submission
+document.getElementById('createPostForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  const formData = {
+    case_id: parseInt(caseId),
+    content: document.getElementById('content').value,
+    source_url: document.getElementById('source_url').value || null,
+    media_url: document.getElementById('media_url').value || null,
+    status: document.getElementById('status').value
+  };
+
+  try {
+    const response = await fetch(`/Case/post/${caseId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (response.ok) {
+      alert('Post created successfully!');
+      hideCreatePostForm();
+      // Refresh the page or reload posts
+      location.reload();
+    } else {
+      const error = await response.text();
+      alert('Error creating post: ' + error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error creating post');
+  }
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('createPostModal');
+  if (event.target === modal) {
+    hideCreatePostForm();
+  }
+}
+
+
 // Update the page with actual case data
 function updatePageWithCaseData(caseData) {
   // Update header with case information

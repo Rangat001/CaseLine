@@ -428,7 +428,7 @@
                 // Store the token in localStorage
                 localStorage.setItem('jwt_token', token);
                 // ✅ Redirect on successful login
-                window.location.href = "/CaseLine/index";
+                window.location.href = "/CaseLine/dashboard";
             } else {
                 const error = await response.text();
                 errorMsg.style.display = 'block';

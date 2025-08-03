@@ -7,9 +7,11 @@ import com.example.rgt.CaseLine.Repository.groupRepository;
 import com.example.rgt.CaseLine.entity.Case;
 import com.example.rgt.CaseLine.entity.Case_Group;
 import com.example.rgt.CaseLine.entity.post;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -44,6 +46,8 @@ public class CaseService {
                 if(existingCase == null) {
                     throw new RuntimeException("Case not found with id: " + caseId);
                 }
+                postContent.setCreated_at(LocalDateTime.now());
+                postContent.setUpdated_at(LocalDateTime.now());
                 postRepository.save(postContent); // This method should be defined in the Case entity
 
             } catch (Exception e) {
@@ -51,6 +55,7 @@ public class CaseService {
             }
         }
 
+        @Transactional
         public void updatePost(int caseId, post postContent){
             try {
                 Case existingCase = caseRepository.findById(caseId);
@@ -62,7 +67,6 @@ public class CaseService {
                     throw new RuntimeException("Post not found with id: " + postContent.getPost_id());
                 }
                 // Update the post content
-
 
                 postRepository.updatepostById(postContent.getPost_id(),
                         postContent.getContent(),

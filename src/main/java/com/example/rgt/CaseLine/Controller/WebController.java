@@ -53,6 +53,11 @@ public class WebController {
         return "index";
     }
 
+    @GetMapping("/dashboard")
+        public String dashboard(){
+            return "emp-dashboard";
+        }
+
     //                              Case Profile
     @GetMapping("/Case_Profile/{id}")
     public String Case_Profile(@PathVariable int id){

@@ -6,6 +6,7 @@ import com.example.rgt.CaseLine.Service.UserService;
 import com.example.rgt.CaseLine.entity.User;
 import com.example.rgt.CaseLine.entity.post;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +34,19 @@ public class CaseController {
             return ResponseEntity.ok(caseService.getCaseDetails(id));
         }catch (Exception e){
             return ResponseEntity.status(500).body("Error retrieving case details: " + e.getMessage());
+        }
+    }
+
+    //                                  Check Member
+    @GetMapping("/{caseId}/check-membership")
+    public ResponseEntity<Boolean> checkCaseMembership(@PathVariable int caseId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            int user_id = userRepository.findIdbyName(authentication.getName()); // Extract user ID from JWT token
+            boolean isMember = caseService.partOfCase(user_id, caseId);
+            return ResponseEntity.ok(isMember);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
         }
     }
 
