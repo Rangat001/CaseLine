@@ -211,6 +211,156 @@
     .btn-submit:hover {
       background: #2563eb;
     }
+
+    /* Post-specific styles */
+    .posts-header {
+      border-bottom: 2px solid #e5e7eb;
+      margin: 30px 0 20px 0;
+      padding-bottom: 10px;
+    }
+
+    .post-entry {
+      border-left: 4px solid #3b82f6;
+      transition: all 0.2s ease;
+    }
+
+    .post-entry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .post-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .post-author,
+    .post-date {
+      font-size: 13px;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 4px 8px;
+      border-radius: 12px;
+    }
+
+    .post-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .status-published {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-draft {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-pending {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .updated-indicator {
+      font-size: 12px;
+      color: #059669;
+      background: #d1fae5;
+      padding: 3px 8px;
+      border-radius: 10px;
+    }
+
+    .post-content {
+      margin: 15px 0;
+    }
+
+    .post-content p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .post-attachments {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .source-link,
+    .media-attachment {
+      margin-bottom: 12px;
+    }
+
+    .attachment-label {
+      font-weight: 600;
+      color: #4b5563;
+      margin-right: 8px;
+    }
+
+    .source-link a,
+    .media-link {
+      color: #3b82f6;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .source-link a:hover,
+    .media-link:hover {
+      text-decoration: underline;
+    }
+
+    .post-media {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .no-posts {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border: 2px dashed #cbd5e1;
+    }
+
+    .no-posts h2 {
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .post-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .post-meta {
+        gap: 8px;
+      }
+
+      .post-author,
+      .post-date {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -354,8 +504,9 @@ async function loadCaseDetails() {
     const caseData = await response.json();
     updatePageWithCaseData(caseData);
 
-    // Check user membership after loading case details
+    // Check user membership and load posts
     await checkUserMembership(caseId);
+    await loadCasePosts(); // Add this line
 
   } catch (error) {
     console.error('Error fetching case details:', error);
@@ -453,6 +604,260 @@ function updatePageWithCaseData(caseData) {
             <div class="info">Case ID: ${caseData.caseId} | Organization: ${caseData.orgId}</div>
             <p>No description available for this case.</p>
         `;
+  }
+}
+
+// Add this function to fetch and display posts
+async function loadCasePosts() {
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  if (!caseId) {
+    console.error('Case ID not found in URL');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/Case/${caseId}/posts`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const posts = await response.json();
+    displayPosts(posts);
+
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+  }
+}
+
+// Updated function to display posts with proper content handling
+function displayPosts(posts) {
+  const container = document.querySelector('.container');
+
+  // Keep the first entry (case description) and remove any existing posts
+  const caseDescriptionEntry = container.querySelector('.entry');
+  container.innerHTML = '';
+  container.appendChild(caseDescriptionEntry);
+
+  if (!posts || posts.length === 0) {
+    const noPostsDiv = document.createElement('div');
+    noPostsDiv.className = 'entry no-posts';
+    noPostsDiv.innerHTML = `
+      <h2>📝 No Posts Yet</h2>
+      <p style="text-align: center; color: #6b7280; font-style: italic;">
+        No posts have been created for this case yet. Be the first to add a post!
+      </p>
+    `;
+    container.appendChild(noPostsDiv);
+    return;
+  }
+
+  // Add posts section header
+  const postsHeaderDiv = document.createElement('div');
+  postsHeaderDiv.className = 'posts-header';
+  postsHeaderDiv.innerHTML = `
+    <h2 style="color: #1e293b; margin: 20px 0; font-size: 24px;">
+      📰 Case Posts (${posts.length})
+    </h2>
+  `;
+  container.appendChild(postsHeaderDiv);
+
+  // Display each post in reverse order (newest first)
+  posts.reverse().forEach(post => {
+    const postDiv = document.createElement('div');
+    postDiv.className = 'entry post-entry';
+
+    const statusClass = getStatusClass(post.status);
+    const formattedDate = formatDate(post.created_at);
+    const updatedDate = post.updated_at && post.updated_at !== post.created_at ?
+            formatDate(post.updated_at) : null;
+
+    // Safely handle content with proper escaping and line breaks
+    const safeContent = escapeHtml(post.content || 'No content available');
+    const contentWithLineBreaks = safeContent.replace(/\n/g, '<br>');
+
+    postDiv.innerHTML = `
+      <div class="post-header">
+        <div class="post-meta">
+          <span class="post-author">👤 Posted by: User ${post.posted_by || 'Unknown'}</span>
+          <span class="post-date">📅 ${formattedDate}</span>
+          <span class="post-status ${statusClass}">${(post.status || 'draft').toUpperCase()}</span>
+        </div>
+        ${updatedDate ?
+            `<span class="updated-indicator">✏️ Updated: ${updatedDate}</span>` : ''
+    }
+      </div>
+
+      <div class="post-content">
+        <p>${contentWithLineBreaks}</p>
+      </div>
+
+      ${(post.source_url || post.media_url) ? createAttachmentsHTML(post) : ''}
+    `;
+
+    container.appendChild(postDiv);
+  });
+}
+
+// Helper function to create attachments HTML
+function createAttachmentsHTML(post) {
+  let attachmentsHTML = '<div class="post-attachments">';
+
+  if (post.source_url) {
+    attachmentsHTML += `
+      <div class="source-link">
+        <span class="attachment-label">🔗 Source:</span>
+        <a href="${escapeHtml(post.source_url)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHtml(post.source_url)}
+        </a>
+      </div>
+    `;
+  }
+
+  if (post.media_url) {
+    const mediaHTML = createMediaHTML(post.media_url);
+    attachmentsHTML += `
+      <div class="media-attachment">
+        <span class="attachment-label">📎 Media:</span>
+        ${mediaHTML}
+      </div>
+    `;
+  }
+
+  attachmentsHTML += '</div>';
+  return attachmentsHTML;
+}
+
+// Helper function to create media HTML based on URL type
+function createMediaHTML(mediaUrl) {
+  const safeUrl = escapeHtml(mediaUrl);
+
+  if (isImageUrl(mediaUrl)) {
+    return `<img src="${safeUrl}" alt="Post media" class="post-media" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="media-link" style="display:none;">
+              View Image File
+            </a>`;
+  } else if (isVideoUrl(mediaUrl)) {
+    return `<video controls class="post-media" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <source src="${safeUrl}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="media-link" style="display:none;">
+              View Video File
+            </a>`;
+  } else {
+    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="media-link">
+              View Media File
+            </a>`;
+  }
+}
+
+// Helper function to safely escape HTML
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Helper function to format dates consistently
+function formatDate(dateString) {
+  if (!dateString) return 'Unknown date';
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    return 'Invalid date';
+  }
+}
+
+// Updated helper functions with better error handling
+function getStatusClass(status) {
+  if (!status) return 'status-draft';
+
+  switch(status.toLowerCase()) {
+    case 'published': return 'status-published';
+    case 'draft': return 'status-draft';
+    case 'pending': return 'status-pending';
+    default: return 'status-draft';
+  }
+}
+
+function isImageUrl(url) {
+  if (!url) return false;
+  return /\.(jpg|jpeg|png|gif|bmp|webp)(\?.*)?$/i.test(url);
+}
+
+function isVideoUrl(url) {
+  if (!url) return false;
+  return /\.(mp4|avi|mov|wmv|flv|webm|m4v)(\?.*)?$/i.test(url);
+}
+
+// Add this debugging function to check what data you're receiving
+async function loadCasePosts() {
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  if (!caseId) {
+    console.error('Case ID not found in URL');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/Case/${caseId}/posts`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const posts = await response.json();
+
+    // Debug: Log the posts data to see what's being received
+    console.log('Received posts data:', posts);
+    console.log('Number of posts:', posts ? posts.length : 0);
+
+    if (posts && posts.length > 0) {
+      console.log('Sample post content:', posts[0].content);
+      console.log('Full first post:', posts[0]);
+    }
+
+    displayPosts(posts);
+
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+
+    // Show error message to user
+    const container = document.querySelector('.container');
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'entry no-posts';
+    errorDiv.innerHTML = `
+      <h2>⚠️ Error Loading Posts</h2>
+      <p style="text-align: center; color: #dc2626;">
+        Unable to load posts for this case. Please try refreshing the page.
+      </p>
+    `;
+    container.appendChild(errorDiv);
   }
 }
 

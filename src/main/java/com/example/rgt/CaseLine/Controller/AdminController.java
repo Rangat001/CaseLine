@@ -113,8 +113,15 @@ public class AdminController {
                     adminService.intial_grp(admin_id,case_id);
                 }
 
+                //             Check if user exists in same organization
+                User member = userRepository.findByEmail(email);
+                
+                if(member == null || member.getOrg_id() != user.getOrg_id()) {
+                    return new ResponseEntity<>("User not found or not in the same organization", HttpStatus.BAD_REQUEST);
+                }
+
                 caseGroupId.setCaseId(case_id);
-                caseGroupId.setUserId(userService.findByMail(email).getUser_id());
+                caseGroupId.setUserId(member.getUser_id());
 
                 caseGroup.setId(caseGroupId);
                 caseGroup.setRole(role);

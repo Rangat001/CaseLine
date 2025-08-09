@@ -27,4 +27,6 @@ public interface PostRepository extends JpaRepository<post, Integer> {
                         @Param("status") post.Status status);
 
 
+    @Query("SELECT p FROM post p WHERE p.case_id = :caseId")
+    List<post> findByCaseId(int caseId);
 }

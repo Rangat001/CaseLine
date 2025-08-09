@@ -1,17 +1,17 @@
 package com.example.rgt.CaseLine.Service;
 
-import com.example.rgt.CaseLine.Repository.CaseRepository;
-import com.example.rgt.CaseLine.Repository.Case_GrupRepository;
-import com.example.rgt.CaseLine.Repository.PostRepository;
-import com.example.rgt.CaseLine.Repository.groupRepository;
+import com.example.rgt.CaseLine.Repository.*;
 import com.example.rgt.CaseLine.entity.Case;
 import com.example.rgt.CaseLine.entity.Case_Group;
+import com.example.rgt.CaseLine.entity.User;
 import com.example.rgt.CaseLine.entity.post;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +27,9 @@ public class CaseService {
 
     @Autowired
     private groupRepository groupRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
         public Case getCaseDetails(int id) {
             try{
@@ -96,4 +99,24 @@ public class CaseService {
         }
 
 
+    public List<post> getCasePosts(int caseId, String name) {
+            try{
+                User user = userRepository.findByName(name);
+                Case existingCase = caseRepository.findById(caseId);
+
+                if (existingCase == null) {
+                    throw new RuntimeException("Case not found with id: " + caseId);
+                }
+
+                if(existingCase.getOrgId() == user.getOrg_id()){
+                    // User is part of the organization that owns the case
+                    List<post> posts = postRepository.findByCaseId(caseId);
+                    return posts;
+                }
+                //      User not a part of the org who own the case
+                return new ArrayList<post>();
+            }catch (Exception e) {
+                throw new RuntimeException("Error retrieving case posts: " + e.getMessage());
+            }
+    }
 }

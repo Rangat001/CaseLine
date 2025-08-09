@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("Case")
 public class CaseController {
@@ -96,5 +98,24 @@ public class CaseController {
             return ResponseEntity.status(500).body("Error updating post: " + e.getMessage());
         }
     }
+
+    @GetMapping("{caseId}/posts")
+    public ResponseEntity<?> getCasePosts(@PathVariable int caseId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if(authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Unauthorized access");
+            }
+            List<post> posts = caseService.getCasePosts(caseId,authentication.getName());
+            if (posts == null || posts.isEmpty()) {
+                return ResponseEntity.status(404).body("No posts found for this case");
+            }
+            return ResponseEntity.ok(posts);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error retrieving case posts: " + e.getMessage());
+        }
+    }
+
 
 }
