@@ -14,6 +14,32 @@
       background: #1f2937;
       color: white;
       padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-header {
+      background: #059669;
+      color: white;
+      padding: 10px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-header:hover {
+      background: #047857;
+    }
+
+    @media screen and (max-width: 768px) {
+      header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
     }
     header h1 {
       margin: 0;
@@ -108,6 +134,7 @@
 
 <header>
   <h1>📊 CaseLine – Org Admin Dashboard</h1>
+  <button class="btn btn-header" onclick="redirectToAddEmployee()">👤 Add Employee</button>
 </header>
 
 <div class="container">
@@ -267,6 +294,10 @@
 
   function  editCase(caseId) {
     window.location.href = `Edit_Case/${caseId}`;
+  }
+
+  function redirectToAddEmployee() {
+    window.location.href = "Add_member";
   }
 </script>
 </body>

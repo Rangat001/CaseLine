@@ -93,11 +93,13 @@
                 body: JSON.stringify(payload)
             });
 
+            console.table(response);
             if (response.ok) {
                 alert('Member added successfully!');
                 window.location.href = '/CaseLine/Admin_dashboard'; // or redirect as needed
             } else {
-                alert('Failed to add member');
+                const errorMessage = await response.text();
+                alert('Error: ' + errorMessage);
             }
         } catch (error) {
             console.error('Error:', error);
