@@ -279,6 +279,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    checkAdmin();
     loadDashboard();
     loadCases();
   });
@@ -299,6 +300,34 @@
   function redirectToAddEmployee() {
     window.location.href = "Add_member";
   }
+
+  async function checkAdmin(){
+    try {
+      const response = await fetch('/User/checkrole', {
+        method: 'GET',
+        headers: getHeaders()
+      });
+
+      if(response.ok){
+        const data = await response.json(); // parse JSON
+        console.table(data);
+          if (data == "admin" || data == "owner") {
+            console.log('User is an admin or owner');
+            return true;
+          } else {
+            console.table(data);
+            console.log('User is not an admin or owner');
+          window.location.href = '/CaseLine/login';
+          return false;
+        }
+      }
+
+    }catch (Error) {
+        console.error('Error checking admin status');
+        window.location.href = '/CaseLine/login';
+    }
+  }
+
 </script>
 </body>
 </html>

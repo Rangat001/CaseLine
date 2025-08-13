@@ -81,7 +81,7 @@ public class CaseService {
             }
         }
 
-        public boolean partOfCase(Integer userId, int caseId) {
+        public boolean partOfCase(Integer userId,Integer org_id, int caseId) {
         try {
             Case existingCase = caseRepository.findById(caseId);
             if (existingCase == null) {
@@ -91,7 +91,8 @@ public class CaseService {
             int groupId = groupRepository.findGroupIdByCaseId(caseId);
             //              Find Role in the Group
             Case_Group.role role = caseGrupRepository.findRoleByUserIdAndGroupId(userId, groupId);
-            if (role != null) return true; // User is part of the case
+
+            if (role != null && org_id == existingCase.getOrgId()) return true; // User is part of the case
             return false;
         } catch (Exception e) {
             throw new RuntimeException("Error checking case membership: " + e.getMessage());

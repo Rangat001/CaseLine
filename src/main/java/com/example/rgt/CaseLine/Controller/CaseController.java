@@ -1,5 +1,6 @@
 package com.example.rgt.CaseLine.Controller;
 
+import com.example.rgt.CaseLine.DTO.Post_DTO;
 import com.example.rgt.CaseLine.Repository.UserRepository;
 import com.example.rgt.CaseLine.Service.CaseService;
 import com.example.rgt.CaseLine.Service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -44,8 +46,8 @@ public class CaseController {
     public ResponseEntity<Boolean> checkCaseMembership(@PathVariable int caseId) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            int user_id = userRepository.findIdbyName(authentication.getName()); // Extract user ID from JWT token
-            boolean isMember = caseService.partOfCase(user_id, caseId);
+            User user = userRepository.findByName(authentication.getName()); // Extract user ID from JWT token
+            boolean isMember = caseService.partOfCase(user.getUser_id(),user.getOrg_id(), caseId);
             return ResponseEntity.ok(isMember);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
@@ -63,7 +65,7 @@ public class CaseController {
             if(postContent == null || postContent.getContent() == null || postContent.getContent().isEmpty()) {
                 return ResponseEntity.badRequest().body("Post content cannot be empty");
             }
-            if(caseService.partOfCase(user.getUser_id(),caseId)){
+            if(caseService.partOfCase(user.getUser_id(),user.getOrg_id(),caseId)){
                 postContent.setCase_id(caseId);
                 postContent.setPosted_by(user.getUser_id());
                 caseService.createPost(caseId, postContent);
@@ -85,7 +87,7 @@ public class CaseController {
             if(authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("Unauthorized access");
             }
-            if(caseService.partOfCase(user.getUser_id(),Case_id)){
+            if(caseService.partOfCase(user.getUser_id(),user.getOrg_id(),Case_id)){
                 postContent.setCase_id(Case_id);
                 postContent.setPosted_by(user.getUser_id());
                 caseService.createPost(Case_id, postContent);
@@ -107,11 +109,18 @@ public class CaseController {
             if(authentication == null || !authentication.isAuthenticated()) {
                 return ResponseEntity.status(401).body("Unauthorized access");
             }
+
             List<post> posts = caseService.getCasePosts(caseId,authentication.getName());
             if (posts == null || posts.isEmpty()) {
                 return ResponseEntity.status(404).body("No posts found for this case");
             }
-            return ResponseEntity.ok(posts);
+            //                    Need to find an efficient solution, but for now it is ok
+            List<Post_DTO> postDTOList = new ArrayList<>();
+            for (post p : posts) {
+                Post_DTO postDTO = new Post_DTO(p);
+                postDTOList.add(postDTO);
+            }
+            return ResponseEntity.ok(postDTOList);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error retrieving case posts: " + e.getMessage());
         }
