@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Getter
 @Setter
 public class Post_DTO {
-    @Autowired
-    private UserRepository userRepository;
+
 
     private int post_id;
     private int case_id;
     private int posted_by_id;
-    private String posted_by;
+    public String posted_by;
     private String created_at;
     private String content;
     private String updated_at;
@@ -29,7 +28,7 @@ public class Post_DTO {
         this.case_id = post.getCase_id();
 
         this.posted_by_id = post.getPosted_by();
-        this.posted_by = userRepository.findNameById(post.getPosted_by());
+//        this.posted_by = userRepository.findNameById(post.getPosted_by());
         this.created_at = post.getCreated_at().toString();
         this.content = post.getContent();
         this.updated_at = post.getUpdated_at().toString();

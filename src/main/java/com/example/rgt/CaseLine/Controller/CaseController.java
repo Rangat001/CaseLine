@@ -115,9 +115,11 @@ public class CaseController {
                 return ResponseEntity.status(404).body("No posts found for this case");
             }
             //                    Need to find an efficient solution, but for now it is ok
+
             List<Post_DTO> postDTOList = new ArrayList<>();
             for (post p : posts) {
                 Post_DTO postDTO = new Post_DTO(p);
+                postDTO.posted_by = userRepository.findNameById(p.getPosted_by());
                 postDTOList.add(postDTO);
             }
             return ResponseEntity.ok(postDTOList);

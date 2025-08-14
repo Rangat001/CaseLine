@@ -214,13 +214,15 @@
     /* Grid Layout for Posts */
     .posts-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
       margin-top: 20px;
+      min-height: 250px; /* Ensures grid structure is visible */
     }
 
     .social-post {
-      margin-bottom: 0; /* Remove bottom margin for grid */
+      margin-bottom: 0;
+      grid-column: span 1; /* Each post takes exactly one column */
     }
 
     .post-card {
@@ -229,7 +231,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       overflow: hidden;
       transition: all 0.2s ease;
-      height: fit-content; /* Important for masonry-like effect */
+      height: fit-content;
+      min-height: 200px; /* Minimum height for consistency */
     }
 
     .post-card:hover {
