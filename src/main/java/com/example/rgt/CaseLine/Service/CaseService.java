@@ -58,6 +58,8 @@ public class CaseService {
             }
         }
 
+
+//                                                  Update Post
         @Transactional
         public void updatePost(int caseId, post postContent){
             try {
@@ -70,16 +72,18 @@ public class CaseService {
                     throw new RuntimeException("Post not found with id: " + postContent.getPost_id());
                 }
                 // Update the post content
-
                 postRepository.updatepostById(postContent.getPost_id(),
                         postContent.getContent(),
                         postContent.getSource_url(),
                         postContent.getMedia_url(),
-                        postContent.getStatus());
+                        postContent.getStatus(),
+                        LocalDateTime.now()
+                        );
             } catch (Exception e) {
                 throw new RuntimeException("Error updating post: " + e.getMessage());
             }
         }
+
 
         public boolean partOfCase(Integer userId,Integer org_id, int caseId) {
         try {
@@ -98,6 +102,8 @@ public class CaseService {
             throw new RuntimeException("Error checking case membership: " + e.getMessage());
         }
         }
+
+
 
         //                          for the sub process of Edit-Post
         public Case_Group.role userRole_IN_case(Integer userId,Integer org_id, int caseId) {
@@ -118,6 +124,7 @@ public class CaseService {
         }
     }
 
+
     //                     check if posted by User(Subprocess of Delete-Post)
     public boolean IsPostOwner(Integer userId,Integer post_id) {
         try {
@@ -133,6 +140,7 @@ public class CaseService {
             throw new RuntimeException("Error checking case membership: " + e.getMessage());
         }
     }
+
 
 
     public List<post> getCasePosts(int caseId, String name) {
