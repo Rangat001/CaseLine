@@ -99,6 +99,41 @@ public class CaseService {
         }
         }
 
+        //                          for the sub process of Edit-Post
+        public Case_Group.role userRole_IN_case(Integer userId,Integer org_id, int caseId) {
+        try {
+            Case existingCase = caseRepository.findById(caseId);
+            if (existingCase == null) {
+                throw new RuntimeException("Case not found with id: " + caseId);
+            }
+            //        Group Id for The Perticular case
+            int groupId = groupRepository.findGroupIdByCaseId(caseId);
+            //              Find Role in the Group
+            Case_Group.role role = caseGrupRepository.findRoleByUserIdAndGroupId(userId, groupId);
+
+            if (role != null && org_id == existingCase.getOrgId()) return role; // User role in Group
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("Error checking case membership: " + e.getMessage());
+        }
+    }
+
+    //                     check if posted by User(Subprocess of Delete-Post)
+    public boolean IsPostOwner(Integer userId,Integer post_id) {
+        try {
+            Optional<post> existingPostOpt = postRepository.findById(post_id);
+            if (existingPostOpt.isEmpty()) {
+                throw new RuntimeException("Post not found with id: " + post_id);
+            }
+
+
+            if (existingPostOpt.get().getPosted_by() == userId) return true; // User is owner of the post
+            return false;
+        } catch (Exception e) {
+            throw new RuntimeException("Error checking case membership: " + e.getMessage());
+        }
+    }
+
 
     public List<post> getCasePosts(int caseId, String name) {
             try{
@@ -120,4 +155,5 @@ public class CaseService {
                 throw new RuntimeException("Error retrieving case posts: " + e.getMessage());
             }
     }
+
 }

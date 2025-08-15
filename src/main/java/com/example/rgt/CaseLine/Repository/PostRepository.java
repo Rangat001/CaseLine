@@ -29,4 +29,7 @@ public interface PostRepository extends JpaRepository<post, Integer> {
 
     @Query("SELECT p FROM post p WHERE p.case_id = :caseId")
     List<post> findByCaseId(int caseId);
+
+    @Query("SELECT p.posted_by FROM post p WHERE p.post_id = :postid")
+    int checkOwnerByid(int postid);
 }

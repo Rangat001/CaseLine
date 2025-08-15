@@ -313,6 +313,7 @@
 
     .post-menu {
       margin-left: auto;
+      position: relative;
     }
 
     .menu-btn {
@@ -328,6 +329,59 @@
 
     .menu-btn:hover {
       background: #f3f4f6;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      min-width: 120px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+      background: #f3f4f6;
+    }
+
+    .dropdown-item:first-child {
+      border-radius: 8px 8px 0 0;
+    }
+
+    .dropdown-item:last-child {
+      border-radius: 0 0 8px 8px;
+    }
+
+    .dropdown-item.delete:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .dropdown-icon {
+      font-size: 16px;
     }
 
     .post-text {
@@ -858,9 +912,19 @@ function displayPosts(posts) {
               <span class="post-status-badge ${statusClass}">${(post.status || 'draft').toUpperCase()}</span>
             </div>
           </div>
-          <div class="post-menu">
-            <button class="menu-btn">⋯</button>
-          </div>
+           <div class="post-menu">
+        <button class="menu-btn" onclick="toggleDropdown(${post.post_id})">⋯</button>
+        <div class="dropdown-menu" id="dropdown-${post.post_id}">
+          <button class="dropdown-item" onclick="editPost(${post.post_id})">
+            <span class="dropdown-icon">✏️</span>
+            Edit Post
+          </button>
+          <button class="dropdown-item delete" onclick="deletePost(${post.post_id})">
+            <span class="dropdown-icon">🗑️</span>
+            Delete Post
+          </button>
+        </div>
+      </div>
         </div>
 
         <!-- Post Content -->
@@ -902,7 +966,78 @@ function displayPosts(posts) {
   container.appendChild(postsGrid);
 }
 
-// Helper function for social media style
+
+//                                               Toggle dropdown menu
+function toggleDropdown(postId) {
+  const dropdown = document.getElementById(`dropdown-${postId}`);
+  const allDropdowns = document.querySelectorAll('.dropdown-menu');
+
+  // Close all other dropdowns
+  allDropdowns.forEach(d => {
+    if (d.id !== `dropdown-${postId}`) {
+      d.classList.remove('show');
+    }
+  });
+
+  // Toggle current dropdown
+  dropdown.classList.toggle('show');
+}
+
+//                                                Edit post function
+function editPost(postId) {
+  // Close dropdown
+  document.getElementById(`dropdown-${postId}`).classList.remove('show');
+
+  // TODO: Implement edit functionality
+  console.log('Edit post:', postId);
+  alert('Edit functionality will be implemented');
+}
+
+//                                              Delete post function
+async function deletePost(postId) {
+  // Close dropdown
+  document.getElementById(`dropdown-${postId}`).classList.remove('show');
+
+  if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+    return;
+  }
+
+  const token = getJwtToken();
+
+  try {
+    const response = await fetch(`/Case/post/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      alert('Post deleted successfully!');
+      // Reload posts
+      await loadCasePosts();
+    } else {
+      const error = await response.text();
+      alert('Error deleting post: ' + error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error deleting post');
+  }
+}
+
+                                               // Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.post-menu')) {
+    document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+  }
+});
+
+
+                                           // Helper function for social media style
 function createSocialMediaHTML(mediaUrl) {
   const safeUrl = escapeHtml(mediaUrl);
 
@@ -933,7 +1068,7 @@ function createSocialMediaHTML(mediaUrl) {
   }
 }
 
-// Helper function to calculate time ago
+                                            // Helper function to calculate time ago
 function getTimeAgo(dateString) {
   const date = new Date(dateString);
   const now = new Date();
@@ -947,7 +1082,7 @@ function getTimeAgo(dateString) {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-// Helper function to safely escape HTML
+                                             // Helper function to safely escape HTML
 function escapeHtml(text) {
   if (!text) return '';
   const div = document.createElement('div');
@@ -955,7 +1090,8 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// Helper function to format dates consistently
+
+                                            // Helper function to format dates consistently
 function formatDate(dateString) {
   if (!dateString) return 'Unknown date';
 
@@ -973,7 +1109,7 @@ function formatDate(dateString) {
   }
 }
 
-// Updated helper functions with better error handling
+                                             // Updated helper functions with better error handling
 function getStatusClass(status) {
   if (!status) return 'status-draft';
 
@@ -995,7 +1131,7 @@ function isVideoUrl(url) {
   return /\.(mp4|avi|mov|wmv|flv|webm|m4v)(\?.*)?$/i.test(url);
 }
 
-// Add this debugging function to check what data you're receiving
+                                    // Add this debugging function to check what data you're receiving
 async function loadCasePosts() {
   const caseId = getCaseIdFromUrl();
   const token = getJwtToken();
@@ -1048,6 +1184,6 @@ async function loadCasePosts() {
   }
 }
 
-// Load case details when page loads
+                                                  // Load case details when page loads
 document.addEventListener('DOMContentLoaded', loadCaseDetails);
 </script>
