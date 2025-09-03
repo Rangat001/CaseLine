@@ -532,6 +532,175 @@
       font-size: 12px;
     }
 
+    /* Case Members Component */
+    .members-section {
+      margin-top: 20px;
+    }
+
+    .members-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .members-header {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .members-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .members-count {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .members-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .member-item {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s ease;
+    }
+
+    .member-item:last-child {
+      border-bottom: none;
+    }
+
+    .member-item:hover {
+      background: #f8fafc;
+    }
+
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .member-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .member-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .member-id {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .member-role {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .role-owner {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .role-admin {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .role-member {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .members-error {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    .members-loading {
+      padding: 20px;
+      text-align: center;
+      color: #6b7280;
+    }
+    /* Members Modal Specific Styles */
+    #membersModal .modal-content {
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    #modalMembersContent {
+      padding: 0;
+    }
+
+    #modalMembersContent .members-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    #modalMembersContent .member-item {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.2s ease;
+    }
+
+    #modalMembersContent .member-item:last-child {
+      border-bottom: none;
+    }
+
+    #modalMembersContent .member-item:hover {
+      background: #f8fafc;
+    }
+
+    #modalMembersContent .members-error,
+    #modalMembersContent .members-loading {
+      padding: 40px 24px;
+      text-align: center;
+      color: #6b7280;
+    }
+
     /* Responsive Grid */
     @media (max-width: 1200px) {
       .posts-container {
@@ -571,6 +740,41 @@
         display: none;
       }
     }
+
+    /* Responsive adjustments for Members list view*/
+    @media (max-width: 768px) {
+      .member-item {
+        padding: 12px 16px;
+        gap: 10px;
+      }
+
+      .member-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+      }
+
+      .members-header {
+        padding: 12px 16px;
+      }
+
+      .members-header h3 {
+        font-size: 16px;
+      }
+
+      .member-name {
+        font-size: 14px;
+      }
+
+      .member-id {
+        font-size: 12px;
+      }
+
+      .member-role {
+        padding: 3px 8px;
+        font-size: 11px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -583,6 +787,9 @@
     <div class="meta">Type: Criminal | Created by: NDTV | Created on: Jan 5, 2022</div>
   </div>
   <div class="header-actions">
+    <button id="viewMembersBtn" class="create-post-btn" onclick="showMembersModal()" style="display: none;">
+      👥 View Members
+    </button>
     <button id="createPostBtn" class="create-post-btn" onclick="showCreatePostForm()" style="display: none;">
       📝 Create Post
     </button>
@@ -593,12 +800,21 @@
 <div class="container">
 
   <div class="entry">
-
   </div>
-
-
   <!-- 🧑‍💼 More team journal posts go here... -->
-
+</div>
+<div id="membersModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>👥 Case Members</h2>
+      <span class="close" onclick="hideMembersModal()">&times;</span>
+    </div>
+    <div id="modalMembersContent">
+      <div class="members-loading">
+        Loading members...
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Create Post Modal/Form -->
@@ -1353,6 +1569,161 @@ async function loadCasePosts() {
   }
 }
 
-                                                  // Load case details when page loads
+                                              // Check if current user can view members (admin/owner only)
+// Updated checkMembersViewPermission function
+async function checkMembersViewPermission() {
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  try {
+    const response = await fetch(`/User/checkrole`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const role = await response.text();
+      const cleanRole = role.replace(/"/g, '').toLowerCase();
+
+      if (cleanRole === 'admin' || cleanRole === 'owner') {
+        // Show the View Members button instead of the members section
+        document.getElementById('viewMembersBtn').style.display = 'block';
+      }
+    }
+  } catch (error) {
+    console.error('Error checking members view permission:', error);
+  }
+}
+
+// Load case members
+function showMembersModal() {
+  document.getElementById('membersModal').style.display = 'block';
+  loadMembersInModal();
+}
+function hideMembersModal() {
+  document.getElementById('membersModal').style.display = 'none';
+}
+// async function loadMembersInModal() {
+//   const caseId = getCaseIdFromUrl();
+//   const token = getJwtToken();
+//
+//   const modalContent = document.getElementById('modalMembersContent');
+//   modalContent.innerHTML = '<div class="members-loading">Loading members...</div>';
+//
+//   try {
+//     const response = await fetch(`/Admin/Case/${caseId}/members`, {
+//       method: 'GET',
+//       headers: {
+//         'Authorization': `Bearer ${token}`,
+//         'Content-Type': 'application/json'
+//       }
+//     });
+//
+//     if (response.ok) {
+//       const members = await response.json();
+//       displayMembers(members);
+//     } else {
+//       showMembersError('Failed to load case members');
+//     }
+//   } catch (error) {
+//     console.error('Error loading case members:', error);
+//     showMembersError('Error loading case members');
+//   }
+// }
+
+// Display members in the modal
+function displayMembersInModal(members) {
+  const modalContent = document.getElementById('modalMembersContent');
+
+  if (!members || members.length === 0) {
+    modalContent.innerHTML = '<div class="members-error">No members found for this case.</div>';
+    return;
+  }
+
+  // Sort members by role priority
+  const roleOrder = { 'owner': 1, 'admin': 2, 'member': 3 };
+  members.sort((a, b) => {
+    const roleA = (a.role || 'member').toLowerCase();
+    const roleB = (b.role || 'member').toLowerCase();
+    return (roleOrder[roleA] || 999) - (roleOrder[roleB] || 999);
+  });
+
+  const membersHTML = members.map(member => {
+    const memberRole = (member.role || 'member').toLowerCase();
+    const roleClass = `role-${memberRole}`;
+    const avatarInitial = member.name ? member.name.charAt(0).toUpperCase() : 'U';
+
+    return `
+      <li class="member-item">
+        <div class="member-avatar">
+          ${avatarInitial}
+        </div>
+        <div class="member-details">
+          <div class="member-name">${escapeHtml(member.name || 'Unknown User')}</div>
+          <div class="member-id">ID: ${member.user_id || 'N/A'}</div>
+        </div>
+        <div class="member-role ${roleClass}">
+          ${memberRole.toUpperCase()}
+        </div>
+      </li>
+    `;
+  }).join('');
+
+  modalContent.innerHTML = `<ul class="members-list">${membersHTML}</ul>`;
+}
+
+// Show members error in modal
+function showMembersError(errorMessage) {
+  const modalContent = document.getElementById('modalMembersContent');
+  modalContent.innerHTML = `<div class="members-error">${errorMessage}</div>`;
+}
+
+// Update the loadMembersInModal function
+async function loadMembersInModal() {
+  const caseId = getCaseIdFromUrl();
+  const token = getJwtToken();
+
+  const modalContent = document.getElementById('modalMembersContent');
+  modalContent.innerHTML = '<div class="members-loading">Loading members...</div>';
+
+  try {
+    const response = await fetch(`/Admin/Case/${caseId}/members`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const members = await response.json();
+      displayMembersInModal(members);
+    } else {
+      showMembersError('Failed to load case members');
+    }
+  } catch (error) {
+    console.error('Error loading case members:', error);
+    showMembersError('Error loading case members');
+  }
+}
+
+// Update the window click handler to close members modal
+window.onclick = function(event) {
+  const createModal = document.getElementById('createPostModal');
+  const membersModal = document.getElementById('membersModal');
+
+  if (event.target === createModal) {
+    hideCreatePostForm();
+  }
+  if (event.target === membersModal) {
+    hideMembersModal();
+  }
+}
+ // Load case details when page loads
 document.addEventListener('DOMContentLoaded', loadCaseDetails);
+document.addEventListener('DOMContentLoaded', checkMembersViewPermission);
+
 </script>
