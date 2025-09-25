@@ -65,7 +65,7 @@ public class WebController {
         return "case_profile";
     }
 
-    
+
     @GetMapping("/case_member/{id}")
     public String case_member(@PathVariable int id){
         return "add-team-member";
