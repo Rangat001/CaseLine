@@ -24,6 +24,7 @@ public class WebController {
         return "org_signup";
     }
 
+
     //                                     Admin Side
     @GetMapping("/Add_member")
     public String signup(){
@@ -64,6 +65,7 @@ public class WebController {
         return "case_profile";
     }
 
+    
     @GetMapping("/case_member/{id}")
     public String case_member(@PathVariable int id){
         return "add-team-member";
