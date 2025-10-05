@@ -1,5 +1,6 @@
 package com.example.rgt.CaseLine.Service;
 
+import com.example.rgt.CaseLine.DTO.CaseDetailsDTO;
 import com.example.rgt.CaseLine.Repository.*;
 import com.example.rgt.CaseLine.entity.Case;
 import com.example.rgt.CaseLine.entity.Case_Group;
@@ -31,13 +32,20 @@ public class CaseService {
     @Autowired
     private UserRepository userRepository;
 
-        public Case getCaseDetails(int id) {
+        public CaseDetailsDTO getCaseDetails(int id) {
             try{
                 Case Case = caseRepository.findById(id);
+                String User_name = userRepository.findNameById(Case.getCreatedBy());
+                if(User_name == null){
+                    throw new RuntimeException("User_name not found with id: " + id);
+                }
+                CaseDetailsDTO case_details = new CaseDetailsDTO(Case.getCaseId(),Case.getOrgId(),Case.getTitle(),Case.getCaseType()
+                        ,Case.getStatus(),Case.getDescription(),Case.getCreatedBy(),User_name,Case.getCreatedAt()
+                        ,Case.getUpdatedAt());
                 if(Case == null) {
                     throw new RuntimeException("Case not found with id: " + id);
                 }
-                return Case;
+                return case_details;
             }catch (Exception e){
                 throw new RuntimeException("Error retrieving case details: " + e.getMessage());
             }

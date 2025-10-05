@@ -783,8 +783,8 @@
 <div class="header">
 <!--  <img src="https://via.placeholder.com/80x80.png?text=Case" alt="Case Cover">-->
   <div class="header-details">
-    <h1>Rajesh Verma - Hit & Run <span class="status-badge">Active</span></h1>
-    <div class="meta">Type: Criminal | Created by: NDTV | Created on: Jan 5, 2022</div>
+    <h1>Null<span class="status-badge">Active</span></h1>
+    <div class="meta">Type: NA | Created by: Null | Created on: Jan 0 0000</div>
   </div>
   <div class="header-actions">
     <button id="viewMembersBtn" class="create-post-btn" onclick="showMembersModal()" style="display: none;">
@@ -1011,7 +1011,7 @@ function updatePageWithCaseData(caseData) {
 
   if (caseData.caseType || caseData.createdBy || caseData.createdAt) {
     const formattedDate = caseData.createdAt ? new Date(caseData.createdAt).toLocaleDateString() : 'N/A';
-    headerMeta.textContent = `Type: ${caseData.caseType || 'N/A'} | Created by: User ${caseData.createdBy || 'N/A'} | Created on: ${formattedDate}`;
+    headerMeta.textContent = `Type: ${caseData.caseType || 'N/A'} | Created by: ${caseData.createdByName || 'N/A'} | Created on: ${formattedDate}`;
   }
 
   // Add case description to the container
