@@ -40,4 +40,6 @@ public interface Case_GrupRepository extends JpaRepository<Case_Group, CaseGroup
 
    @Query("SELECT cg.role FROM Case_Group cg WHERE cg.id.userId = :userId AND cg.id.caseId = :caseId")
    String findRoleByUserIdAndCaseId(Integer userId, int caseId);
+
+   // total cases in emp dashboard
 }
