@@ -52,23 +52,7 @@ public class UserController {
         return ResponseEntity.status(403).body("User not found");
     }
 
-//    @GetMapping("/dashboard_data")
-//    public ResponseEntity<?> dashboard_data() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.isAuthenticated()) {
-//            User user = userRepository.findByName(authentication.getName());
-//            int org_id = user.getOrg_id();
-//            int user_id = user.getUser_id();
-//            int total_cases = caseGrupRepository.countDistinctCasesByUserIdAndOrgId(user_id, org_id);
-//            int open_cases = caseGrupRepository.countCasesByUserIdAndOrgIdAndStatus(user_id, org_id, "Open");
-//            int closed_cases = caseGrupRepository.countCasesByUserIdAndOrgIdAndStatus(user_id, org_id, "Closed");
-//
-//            String response = "{ \"total_cases\": " + total_cases +
-//                    ", \"open_cases\": " + open_cases +
-//                    ", \"closed_cases\": " + closed_cases + " }";
-//
-//            return ResponseEntity.ok(response);
-//        }
-//        return ResponseEntity.status(403).body("User not found");
-//    }
+
+    //  get the case details by emp for dashboard
+
 }

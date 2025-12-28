@@ -32,6 +32,7 @@ public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private UserService userService;
 

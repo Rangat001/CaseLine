@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class Case_Group {
 
+    // EmbeddedId class to represent composite key   Here Case_id+user_id = primary key
     @EmbeddedId
     private CaseGroupId id;
 

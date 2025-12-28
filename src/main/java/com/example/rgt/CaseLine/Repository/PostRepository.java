@@ -13,11 +13,19 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<post, Integer> {
 
+    //     Count total post for specific case
     @Query("SELECT COUNT(p) " +
             "FROM post p " +
             "JOIN Case c ON p.case_id = c.caseId " +
             "WHERE c.createdBy = :createdBy")
     Integer countTotalPostsByCreatedBy(@Param("createdBy") Integer createdBy);
+
+    // Count total post made by specific user
+    @Query("SELECT COUNT(p) " +
+            "FROM post p " +
+            "WHERE p.posted_by = :posted_by")
+    Integer countTotalPosts(@Param("posted_by") Integer posted_by);
+
 
     @Modifying
     @Query("UPDATE post p SET p.content = :content, p.source_url = :source_url, p.media_url = :media_url, p.status = :status,p.updated_at = :updatedtime WHERE p.post_id = :post_id")

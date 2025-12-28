@@ -37,7 +37,6 @@ public class AdminService {
 
     //                            Create INtial Case_Group
     public boolean check_intial_grp(int Admin_id, int case_id) {
-
         List<Case_Group> list = caseGrupRepository.findAllByCase_id(case_id);
         if (list.size() == 0) {
             return true;
