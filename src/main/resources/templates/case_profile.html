@@ -1384,13 +1384,13 @@ async function deletePost(postId) {
       return;
     }
 
-    // If permission check passes, confirm deletion
+                                 // If permission check passes, confirm deletion
     if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
       return;
     }
 
-    // Proceed with deletion (implement the actual delete endpoint)
-    const deleteResponse = await fetch(`/Case/post/${postId}`, {
+                                   // Proceed with deletion (implement the actual delete endpoint)
+    const deleteResponse = await fetch(`/Case/post/${caseId}/${postId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

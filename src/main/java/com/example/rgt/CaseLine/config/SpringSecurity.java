@@ -39,7 +39,7 @@ public class SpringSecurity {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests(request -> request
                 .requestMatchers("/CaseLine/**","/auth/login","/auth/org_signup","/auth/org_login").permitAll()
-                                .requestMatchers("/auth/signup", "/Admin/**","/Case/**","/User/**").authenticated()
+                                .requestMatchers("/auth/signup", "/Admin/**","/Case/**","/User/**","/emp/**").authenticated()
                 ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)

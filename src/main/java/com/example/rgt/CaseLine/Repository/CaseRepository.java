@@ -29,9 +29,9 @@ public interface CaseRepository extends JpaRepository<Case, Integer> {
     @Query("""
         SELECT COUNT(DISTINCT c.caseId)
         FROM Case c
-        JOIN Case_Group cg
+        JOIN Case_Group cg ON cg.id.caseId = c.caseId
         WHERE c.status = 'ongoing'
-          AND cg.id.userId = :userId
+        AND cg.id.userId = :userId
     """)
     Integer countOngoingCasesByUser(@Param("userId") Integer userId);
 
@@ -39,7 +39,7 @@ public interface CaseRepository extends JpaRepository<Case, Integer> {
     @Query("""
         SELECT COUNT(DISTINCT c.caseId)
         FROM Case c
-        JOIN Case_Group cg
+        JOIN Case_Group cg ON cg.id.caseId = c.caseId
         WHERE c.status = 'closed'
           AND cg.id.userId = :userId
     """)

@@ -101,6 +101,23 @@ public class CaseController {
             return ResponseEntity.status(500).body("Error updating post: " + e.getMessage());
         }
     }
+    //                                  Delete Post
+    @DeleteMapping("post/{caseId}/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable int caseId, @PathVariable int postId) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User user = userRepository.findByName(authentication.getName());
+
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return ResponseEntity.status(401).body("Unauthorized access");
+            }
+            caseService.deletePost(caseId, user.getUser_id(), user.getOrg_id(), postId);
+
+            return ResponseEntity.ok("Post deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error deleting post: " + e.getMessage());
+        }
+    }
 
 
     //    These two methods check Editability and Check deleatibility is used for check authority so not nned to check authority in editpost and delete post mathods
@@ -177,8 +194,4 @@ public class CaseController {
             return ResponseEntity.status(500).body("Error retrieving case posts: " + e.getMessage());
         }
     }
-
-
-
-
 }

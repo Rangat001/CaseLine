@@ -92,6 +92,42 @@ public class CaseService {
             }
         }
 
+        //                                   Delete Post
+        @Transactional
+        public void deletePost(int caseId, Integer userId, Integer orgId, Integer postId) {
+            try {
+                Case existingCase = caseRepository.findById(caseId);
+                if (existingCase == null) {
+                    throw new RuntimeException("Case not found with id: " + caseId);
+                }
+
+                if (orgId == null || !orgId.equals(existingCase.getOrgId())) {
+                    throw new RuntimeException("User not authorized for this case organization");
+                }
+
+                post existingPost = postRepository.findById(postId)
+                        .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+
+                Integer postCaseId = existingPost.getCase_id();
+                if (postCaseId == null || !postCaseId.equals(caseId)) {
+                    throw new RuntimeException("Post does not belong to case id: " + caseId);
+                }
+
+
+                // New condition: post writer (creator) can delete their own post
+                boolean isPostWriter = existingPost.getPosted_by() != null
+                        && existingPost.getPosted_by().equals(userId);
+
+                if (!(isPostWriter)) {
+                    throw new RuntimeException("User not allowed to delete this post");
+                }
+
+                postRepository.deleteById(postId);
+            } catch (Exception e) {
+                throw new RuntimeException("Error deleting post: " + e.getMessage());
+            }
+        }
+
 
         public boolean partOfCase(Integer userId,Integer org_id, int caseId) {
         try {
