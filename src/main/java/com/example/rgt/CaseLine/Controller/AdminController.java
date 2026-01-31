@@ -11,6 +11,14 @@ import com.example.rgt.CaseLine.entity.Case;
 import com.example.rgt.CaseLine.entity.CaseGroupId;
 import com.example.rgt.CaseLine.entity.Case_Group;
 import com.example.rgt.CaseLine.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.reactor.ReactorEnvironmentPostProcessor;
 import org.springframework.http.HttpStatus;
@@ -39,7 +47,11 @@ public class AdminController {
     @Autowired
     private CaseRepository caseRepository;
 
-
+    @Operation(summary = "Create new case", description = "Admin/Owner creates a new case in the organization", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Case created successfully"),
+            @ApiResponse(responseCode = "400", description = "Unauthorized or invalid request")
+    })
     @PostMapping("/create_case")
     public ResponseEntity<?>  create_case(@RequestBody Case entity, TimeZone timeZone){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,6 +73,12 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Get all cases", description = "Retrieve all cases managed by the authenticated admin/owner", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cases retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
     @GetMapping("/cases")
     public ResponseEntity<?> getCasesByAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -74,6 +92,12 @@ public class AdminController {
     }
 
     // Admin' data Total cases, total posts,Team member under Their case,Active Close Ratio
+    @Operation(summary = "Get admin dashboard data", description = "Get dashboard statistics including total cases, posts, team members, and active/close ratio", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dashboard data retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AdminDashboardDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
     @GetMapping("/data")
     public ResponseEntity<?> getInfo(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -95,6 +119,11 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Add member to case", description = "Admin/Owner adds a team member to a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Member added successfully"),
+            @ApiResponse(responseCode = "400", description = "User not found or not in same organization")
+    })
     @PostMapping("/add_member")
     public ResponseEntity<?> addMember(@RequestBody Add_memberDTO addMemberDTO){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -133,6 +162,13 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Get case members", description = "Retrieve all members of a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Members retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
+    @Parameter(name = "id", description = "Case ID", required = true)
     @GetMapping("/Case/{id}/members")
     public ResponseEntity<?> getCaseMembers(@PathVariable int id) {
 
@@ -151,6 +187,15 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Update member role in case", description = "Admin/Owner updates a team member's role in a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
+    @Parameters({
+            @Parameter(name = "caseId", description = "Case ID", required = true),
+            @Parameter(name = "userId", description = "User ID", required = true)
+    })
     @PutMapping("/Case/{caseId}/member/{userId}/role")
     public ResponseEntity<?> updateMemberRole(@PathVariable int caseId, @PathVariable int userId, @RequestBody Case_Group.role role) {
 
@@ -168,6 +213,12 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Update case details", description = "Admin/Owner updates case information", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Case updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
+    @Parameter(name = "id", description = "Case ID", required = true)
     @PutMapping("/Case/{id}")
     public ResponseEntity<?> updateCase(@PathVariable int id, @RequestBody Case entity) {
 
@@ -191,7 +242,15 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-
+    @Operation(summary = "Remove member from case", description = "Admin/Owner removes a team member from a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Member removed successfully"),
+            @ApiResponse(responseCode = "400", description = "Unauthorized access")
+    })
+    @Parameters({
+            @Parameter(name = "caseId", description = "Case ID", required = true),
+            @Parameter(name = "userId", description = "User ID to remove", required = true)
+    })
     @DeleteMapping("/Case/{caseId}/member/{userId}")
     public ResponseEntity<?> deleteMember(@PathVariable int caseId, @PathVariable int userId) {
 

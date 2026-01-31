@@ -38,7 +38,7 @@ public class SpringSecurity {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests(request -> request
-                .requestMatchers("/CaseLine/**","/auth/login","/auth/org_signup","/auth/org_login").permitAll()
+                .requestMatchers("/CaseLine/**","/auth/login","/auth/org_signup","/auth/org_login","/swagger-ui/**","/v3/api-docs/**","/swagger-ui.html").permitAll()
                                 .requestMatchers("/auth/signup", "/Admin/**","/Case/**","/User/**","/emp/**").authenticated()
                 ).sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

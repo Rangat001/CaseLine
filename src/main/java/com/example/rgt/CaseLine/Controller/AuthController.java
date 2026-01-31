@@ -7,6 +7,11 @@ import com.example.rgt.CaseLine.Service.*;
 import com.example.rgt.CaseLine.entity.Organization;
 import com.example.rgt.CaseLine.entity.User;
 import com.example.rgt.CaseLine.util.JWTutil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +60,12 @@ public class AuthController {
     @Autowired
     private OrgService orgService;
 
-
+    @Operation(summary = "Create new user/employee", description = "Only Admin/Owner creates a new employee user in their organization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request or unauthorized")
+    })
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@RequestBody User userEntity) {
         try{
@@ -74,6 +84,12 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Employee/User login", description = "Login endpoint for employees (non-owner users)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful, returns JWT token",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Incorrect credentials or owner attempting to login")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User userEntity){
         try{
@@ -92,6 +108,12 @@ public class AuthController {
 
     //                                          Organization
 
+    @Operation(summary = "Register new organization", description = "Create a new organization with owner account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization created successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Organization.class))),
+            @ApiResponse(responseCode = "400", description = "Error creating organization")
+    })
     @PostMapping("/org_signup")
     public ResponseEntity<Organization> createOrg(@RequestBody OrgLoginDTO org) {
         try {
@@ -113,6 +135,12 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Organization owner login", description = "Login endpoint for organization owners only")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login successful, returns JWT token",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Incorrect credentials or non-owner attempting to login")
+    })
     @PostMapping("/org_login")
     public ResponseEntity<?> login_org(@RequestBody User user){
         try{

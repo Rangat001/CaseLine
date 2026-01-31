@@ -7,6 +7,14 @@ import com.example.rgt.CaseLine.Service.UserService;
 import com.example.rgt.CaseLine.entity.Case_Group;
 import com.example.rgt.CaseLine.entity.User;
 import com.example.rgt.CaseLine.entity.post;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +36,13 @@ public class CaseController {
     @Autowired
     private UserRepository userRepository;
 
+    @Operation(summary = "Get case details", description = "Retrieve detailed information about a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Case details retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @Parameter(name = "id", description = "Case ID", required = true)
     @GetMapping("{id}")
     public ResponseEntity<?> getCaseDetails(@PathVariable int id) {
         try{
@@ -42,6 +57,13 @@ public class CaseController {
     }
 
     //                                  Check Member
+    @Operation(summary = "Check case membership", description = "Check if authenticated user is a member of the specified case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Membership status returned",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    @Parameter(name = "caseId", description = "Case ID", required = true)
     @GetMapping("/{caseId}/check-membership")
     public ResponseEntity<Boolean> checkCaseMembership(@PathVariable int caseId) {
         try {
@@ -54,6 +76,16 @@ public class CaseController {
         }
     }
 
+    //                              Create Post
+    @Operation(summary = "Create post in case", description = "Create a new post/update in a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post created successfully"),
+            @ApiResponse(responseCode = "400", description = "Post content cannot be empty"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "User not part of this case"),
+            @ApiResponse(responseCode = "500", description = "Error creating post")
+    })
+    @Parameter(name = "caseId", description = "Case ID", required = true)
     @PostMapping("post/{caseId}")
     public ResponseEntity<?> createPost(@PathVariable int caseId, @RequestBody post postContent) {
         try {
@@ -80,6 +112,14 @@ public class CaseController {
     }
 
     //                                  Edit Post
+    @Operation(summary = "Update post", description = "Update an existing post in a case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post updated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "User not part of this case"),
+            @ApiResponse(responseCode = "500", description = "Error updating post")
+    })
+    @Parameter(name = "Case_id", description = "Case ID", required = true)
     @PutMapping("post/{Case_id}")
     public ResponseEntity<?> updatePost(@PathVariable int Case_id, @RequestBody post postContent) {
         try {
@@ -101,7 +141,18 @@ public class CaseController {
             return ResponseEntity.status(500).body("Error updating post: " + e.getMessage());
         }
     }
+
     //                                  Delete Post
+    @Operation(summary = "Delete post", description = "Delete a post from a case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "500", description = "Error deleting post")
+    })
+    @Parameters({
+            @Parameter(name = "caseId", description = "Case ID", required = true),
+            @Parameter(name = "postId", description = "Post ID", required = true)
+    })
     @DeleteMapping("post/{caseId}/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable int caseId, @PathVariable int postId) {
         try {
@@ -125,6 +176,17 @@ public class CaseController {
 
 
     //                                        check authority to edit the post
+    @Operation(summary = "Check post edit permission", description = "Check if user has permission to edit a specific post", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User can edit the post"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "User not eligible to edit this post"),
+            @ApiResponse(responseCode = "500", description = "Error checking post editability")
+    })
+    @Parameters({
+            @Parameter(name = "caseId", description = "Case ID", required = true),
+            @Parameter(name = "postId", description = "Post ID", required = true)
+    })
     @GetMapping("editablility/{caseId}/{postId}")
     public ResponseEntity<?> checkeditability(@PathVariable int caseId, @PathVariable int postId) {
         // If the user ownes the Post or is an editor in the case
@@ -147,6 +209,17 @@ public class CaseController {
 
 
     //                                          Check ability to delete the post
+    @Operation(summary = "Check post delete permission", description = "Check if user has permission to delete a specific post", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User can delete the post"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "403", description = "User not eligible to delete this post"),
+            @ApiResponse(responseCode = "500", description = "Error checking post deletability")
+    })
+    @Parameters({
+            @Parameter(name = "caseId", description = "Case ID", required = true),
+            @Parameter(name = "postId", description = "Post ID", required = true)
+    })
     @GetMapping("deletability/{caseId}/{postId}")
     public ResponseEntity<?> checkdeletability(@PathVariable int caseId, @PathVariable int postId) {
         // If the user ownes the Post
@@ -168,6 +241,13 @@ public class CaseController {
     }
 
 
+    @Operation(summary = "Get all posts in case", description = "Retrieve all posts/updates for a specific case", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Posts retrieved successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = List.class))),
+            @ApiResponse(responseCode = "500", description = "Error retrieving case posts")
+    })
+    @Parameter(name = "caseId", description = "Case ID", required = true)
     @GetMapping("{caseId}/posts")
     public ResponseEntity<?> getCasePosts(@PathVariable int caseId) {
         try {
