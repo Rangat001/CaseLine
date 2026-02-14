@@ -9,6 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("CaseLine")
 public class WebController {
 
+    @GetMapping("")
+    public String home(){
+        return "index";
+    }
+
+    @GetMapping("/")
+    public String home_2(){
+        return "index";
+    }
+
     @GetMapping("/login")
     public String login(){
         return "user_login";
