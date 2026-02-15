@@ -38,7 +38,7 @@ public class Case {
 
     // Enum for caseType
     public enum CaseType {
-        criminal, political, legal, event, accident // add all enum values
+        criminal, political, legal, event, accident , scam // add all enum values
     }
 
     public enum Status {
